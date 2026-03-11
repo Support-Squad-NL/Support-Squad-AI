@@ -6,7 +6,7 @@ import { createFixtureSuite } from "../test-utils/fixture-suite.js";
 import { writeSkill } from "./skills.e2e-test-helpers.js";
 import { buildWorkspaceSkillsPrompt } from "./skills.js";
 
-const fixtureSuite = createFixtureSuite("openclaw-skills-prompt-suite-");
+const fixtureSuite = createFixtureSuite("supportsquadai-skills-prompt-suite-");
 
 beforeAll(async () => {
   await fixtureSuite.setup();
@@ -63,31 +63,31 @@ describe("buildWorkspaceSkillsPrompt", () => {
       dir: path.join(skillsDir, "bin-skill"),
       name: "bin-skill",
       description: "Needs a bin",
-      metadata: '{"openclaw":{"requires":{"bins":["fakebin"]}}}',
+      metadata: '{"supportsquadai":{"requires":{"bins":["fakebin"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "anybin-skill"),
       name: "anybin-skill",
       description: "Needs any bin",
-      metadata: '{"openclaw":{"requires":{"anyBins":["missingbin","fakebin"]}}}',
+      metadata: '{"supportsquadai":{"requires":{"anyBins":["missingbin","fakebin"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "config-skill"),
       name: "config-skill",
       description: "Needs config",
-      metadata: '{"openclaw":{"requires":{"config":["browser.enabled"]}}}',
+      metadata: '{"supportsquadai":{"requires":{"config":["browser.enabled"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "always-skill"),
       name: "always-skill",
       description: "Always on",
-      metadata: '{"openclaw":{"always":true,"requires":{"env":["MISSING"]}}}',
+      metadata: '{"supportsquadai":{"always":true,"requires":{"env":["MISSING"]}}}',
     });
     await writeSkill({
       dir: path.join(skillsDir, "env-skill"),
       name: "env-skill",
       description: "Needs env",
-      metadata: '{"openclaw":{"requires":{"env":["ENV_KEY"]},"primaryEnv":"ENV_KEY"}}',
+      metadata: '{"supportsquadai":{"requires":{"env":["ENV_KEY"]},"primaryEnv":"ENV_KEY"}}',
     });
 
     const managedSkillsDir = path.join(workspaceDir, ".managed");
@@ -129,7 +129,7 @@ describe("buildWorkspaceSkillsPrompt", () => {
       dir: skillDir,
       name: "alias-skill",
       description: "Uses skillKey",
-      metadata: '{"openclaw":{"skillKey":"alias"}}',
+      metadata: '{"supportsquadai":{"skillKey":"alias"}}',
     });
 
     const prompt = buildWorkspaceSkillsPrompt(workspaceDir, {

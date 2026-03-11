@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/bluebubbles",
+  "name": "@supportsquadai/bluebubbles",
   "version": "2026.2.23",
-  "description": "OpenClaw BlueBubbles channel plugin",
+  "description": "SupportSquadAI BlueBubbles channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ],
@@ -28,7 +28,7 @@
       "order": 75
     },
     "install": {
-      "npmSpec": "@openclaw/bluebubbles",
+      "npmSpec": "@supportsquadai/bluebubbles",
       "localPath": "extensions/bluebubbles",
       "defaultChoice": "npm"
     }

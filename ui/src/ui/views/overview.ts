@@ -1,6 +1,7 @@
 import { html } from "lit";
 import { ConnectErrorDetailCodes } from "../../../../src/gateway/protocol/connect-error-details.js";
 import { t, i18n, type Locale } from "../../i18n/index.ts";
+import { resolveDocsUrl } from "../brand.ts";
 import { formatRelativeTimestamp, formatDurationHuman } from "../format.ts";
 import type { GatewayHelloOk } from "../gateway.ts";
 import { formatNextRun } from "../presenter.ts";
@@ -19,6 +20,7 @@ export type OverviewProps = {
   cronEnabled: boolean | null;
   cronNext: number | null;
   lastChannelsRefresh: number | null;
+  docsUrl: string;
   onSettingsChange: (next: UiSettings) => void;
   onPasswordChange: (next: string) => void;
   onSessionKeyChange: (next: string) => void;
@@ -49,8 +51,8 @@ export function renderOverview(props: OverviewProps) {
       <div class="muted" style="margin-top: 8px">
         ${t("overview.pairing.hint")}
         <div style="margin-top: 6px">
-          <span class="mono">openclaw devices list</span><br />
-          <span class="mono">openclaw devices approve &lt;requestId&gt;</span>
+          <span class="mono">supportsquadai devices list</span><br />
+          <span class="mono">supportsquadai devices approve &lt;requestId&gt;</span>
         </div>
         <div style="margin-top: 6px; font-size: 12px;">
           ${t("overview.pairing.mobileHint")}
@@ -58,7 +60,7 @@ export function renderOverview(props: OverviewProps) {
         <div style="margin-top: 6px">
           <a
             class="session-link"
-            href="https://docs.openclaw.ai/web/control-ui#device-pairing-first-connection"
+              href=${resolveDocsUrl(props.docsUrl, "/web/control-ui#device-pairing-first-connection")}
             target="_blank"
             rel="noreferrer"
             title="Device pairing docs (opens in new tab)"
@@ -109,13 +111,13 @@ export function renderOverview(props: OverviewProps) {
         <div class="muted" style="margin-top: 8px">
           ${t("overview.auth.required")}
           <div style="margin-top: 6px">
-            <span class="mono">openclaw dashboard --no-open</span> → tokenized URL<br />
-            <span class="mono">openclaw doctor --generate-gateway-token</span> → set token
+            <span class="mono">supportsquadai dashboard --no-open</span> → tokenized URL<br />
+            <span class="mono">supportsquadai doctor --generate-gateway-token</span> → set token
           </div>
           <div style="margin-top: 6px">
             <a
               class="session-link"
-              href="https://docs.openclaw.ai/web/dashboard"
+              href=${resolveDocsUrl(props.docsUrl, "/web/dashboard")}
               target="_blank"
               rel="noreferrer"
               title="Control UI auth docs (opens in new tab)"
@@ -127,11 +129,11 @@ export function renderOverview(props: OverviewProps) {
     }
     return html`
       <div class="muted" style="margin-top: 8px">
-        ${t("overview.auth.failed", { command: "openclaw dashboard --no-open" })}
+        ${t("overview.auth.failed", { command: "supportsquadai dashboard --no-open" })}
         <div style="margin-top: 6px">
           <a
             class="session-link"
-            href="https://docs.openclaw.ai/web/dashboard"
+            href=${resolveDocsUrl(props.docsUrl, "/web/dashboard")}
             target="_blank"
             rel="noreferrer"
             title="Control UI auth docs (opens in new tab)"
@@ -170,7 +172,7 @@ export function renderOverview(props: OverviewProps) {
         <div style="margin-top: 6px">
           <a
             class="session-link"
-            href="https://docs.openclaw.ai/gateway/tailscale"
+            href=${resolveDocsUrl(props.docsUrl, "/gateway/tailscale")}
             target="_blank"
             rel="noreferrer"
             title="Tailscale Serve docs (opens in new tab)"
@@ -179,7 +181,7 @@ export function renderOverview(props: OverviewProps) {
           <span class="muted"> · </span>
           <a
             class="session-link"
-            href="https://docs.openclaw.ai/web/control-ui#insecure-http"
+            href=${resolveDocsUrl(props.docsUrl, "/web/control-ui#insecure-http")}
             target="_blank"
             rel="noreferrer"
             title="Insecure HTTP docs (opens in new tab)"
@@ -221,7 +223,7 @@ export function renderOverview(props: OverviewProps) {
                       const v = (e.target as HTMLInputElement).value;
                       props.onSettingsChange({ ...props.settings, token: v });
                     }}
-                    placeholder="OPENCLAW_GATEWAY_TOKEN"
+                    placeholder="SUPPORTSQUADAI_GATEWAY_TOKEN"
                   />
                 </label>
                 <label class="field">

@@ -4,12 +4,13 @@ import path from "node:path";
 import { inspect } from "node:util";
 import { cancel, isCancel } from "@clack/prompts";
 import { DEFAULT_AGENT_WORKSPACE_DIR, ensureAgentWorkspace } from "../agents/workspace.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import { CONFIG_PATH } from "../config/config.js";
 import { resolveAgentModelPrimaryValue } from "../config/model-input.js";
 import { resolveSessionTranscriptsDirForAgent } from "../config/sessions.js";
 import { callGateway } from "../gateway/call.js";
 import { normalizeControlUiBasePath } from "../gateway/control-ui-shared.js";
+import { resolveBrandDocsLink, resolveBrandName } from "../gateway/control-ui-brand.js";
 import { pickPrimaryLanIPv4, isValidIPv4 } from "../gateway/net.js";
 import { isSafeExecutableValue } from "../infra/exec-safety.js";
 import { pickPrimaryTailnetIPv4 } from "../infra/tailnet.js";
@@ -37,7 +38,7 @@ export function guardCancel<T>(value: T | symbol, runtime: RuntimeEnv): T {
   return value;
 }
 
-export function summarizeExistingConfig(config: OpenClawConfig): string {
+export function summarizeExistingConfig(config: SupportSquadAIConfig): string {
   const rows: string[] = [];
   const defaults = config.agents?.defaults;
   if (defaults?.workspace) {
@@ -99,22 +100,23 @@ export function validateGatewayPasswordInput(value: unknown): string | undefined
 }
 
 export function printWizardHeader(runtime: RuntimeEnv) {
+  const productName = resolveBrandName().toUpperCase();
   const header = [
     "▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄",
     "██░▄▄▄░██░▄▄░██░▄▄▄██░▀██░██░▄▄▀██░████░▄▄▀██░███░██",
     "██░███░██░▀▀░██░▄▄▄██░█░█░██░█████░████░▀▀░██░█░█░██",
     "██░▀▀▀░██░█████░▀▀▀██░██▄░██░▀▀▄██░▀▀░█░██░██▄▀▄▀▄██",
     "▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀",
-    "                  🦞 OPENCLAW 🦞                    ",
+    `                  🦞 ${productName} 🦞                    `,
     " ",
   ].join("\n");
   runtime.log(header);
 }
 
 export function applyWizardMetadata(
-  cfg: OpenClawConfig,
+  cfg: SupportSquadAIConfig,
   params: { command: string; mode: OnboardMode },
-): OpenClawConfig {
+): SupportSquadAIConfig {
   const commit = process.env.GIT_COMMIT?.trim() || process.env.GIT_SHA?.trim() || undefined;
   return {
     ...cfg,
@@ -221,8 +223,8 @@ export function formatControlUiSshHint(params: {
     localUrl,
     authedUrl,
     "Docs:",
-    "https://docs.openclaw.ai/gateway/remote",
-    "https://docs.openclaw.ai/web/control-ui",
+    resolveBrandDocsLink("/gateway/remote"),
+    resolveBrandDocsLink("/web/control-ui"),
   ]
     .filter(Boolean)
     .join("\n");

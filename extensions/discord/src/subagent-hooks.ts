@@ -1,10 +1,10 @@
-import type { OpenClawPluginApi } from "openclaw/plugin-sdk";
+import type { SupportSquadAIPluginApi } from "supportsquadai/plugin-sdk";
 import {
   autoBindSpawnedDiscordSubagent,
   listThreadBindingsBySessionKey,
   resolveDiscordAccount,
   unbindThreadBindingsBySessionKey,
-} from "openclaw/plugin-sdk";
+} from "supportsquadai/plugin-sdk";
 
 function summarizeError(err: unknown): string {
   if (err instanceof Error) {
@@ -16,7 +16,7 @@ function summarizeError(err: unknown): string {
   return "error";
 }
 
-export function registerDiscordSubagentHooks(api: OpenClawPluginApi) {
+export function registerDiscordSubagentHooks(api: SupportSquadAIPluginApi) {
   const resolveThreadBindingFlags = (accountId?: string) => {
     const account = resolveDiscordAccount({
       cfg: api.config,

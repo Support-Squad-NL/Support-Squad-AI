@@ -1,26 +1,26 @@
 ---
-summary: "CLI reference for `openclaw daemon` (legacy alias for gateway service management)"
+summary: "CLI reference for `supportsquadai daemon` (legacy alias for gateway service management)"
 read_when:
-  - You still use `openclaw daemon ...` in scripts
+  - You still use `supportsquadai daemon ...` in scripts
   - You need service lifecycle commands (install/start/stop/restart/status)
 title: "daemon"
 ---
 
-# `openclaw daemon`
+# `supportsquadai daemon`
 
 Legacy alias for Gateway service management commands.
 
-`openclaw daemon ...` maps to the same service control surface as `openclaw gateway ...` service commands.
+`supportsquadai daemon ...` maps to the same service control surface as `supportsquadai gateway ...` service commands.
 
 ## Usage
 
 ```bash
-openclaw daemon status
-openclaw daemon install
-openclaw daemon start
-openclaw daemon stop
-openclaw daemon restart
-openclaw daemon uninstall
+supportsquadai daemon status
+supportsquadai daemon install
+supportsquadai daemon start
+supportsquadai daemon stop
+supportsquadai daemon restart
+supportsquadai daemon uninstall
 ```
 
 ## Subcommands
@@ -40,4 +40,4 @@ openclaw daemon uninstall
 
 ## Prefer
 
-Use [`openclaw gateway`](/cli/gateway) for current docs and examples.
+Use [`supportsquadai gateway`](/cli/gateway) for current docs and examples.

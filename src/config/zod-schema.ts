@@ -121,7 +121,7 @@ const HttpUrlSchema = z
     return protocol === "http:" || protocol === "https:";
   }, "Expected http:// or https:// URL");
 
-export const OpenClawSchema = z
+export const SupportSquadAISchema = z
   .object({
     $schema: z.string().optional(),
     meta: z
@@ -262,6 +262,15 @@ export const OpenClawSchema = z
     ui: z
       .object({
         seamColor: HexColorSchema.optional(),
+        brand: z
+          .object({
+            name: z.string().max(60).optional(),
+            subtitle: z.string().max(80).optional(),
+            docsUrl: z.url().max(500).optional(),
+            siteUrl: z.url().max(500).optional(),
+          })
+          .strict()
+          .optional(),
         assistant: z
           .object({
             name: z.string().max(50).optional(),

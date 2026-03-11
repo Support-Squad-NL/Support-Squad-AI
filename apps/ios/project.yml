@@ -1,6 +1,6 @@
-name: OpenClaw
+name: SupportSquadAI
 options:
-  bundleIdPrefix: ai.openclaw
+  bundleIdPrefix: ai.supportsquadai
   deploymentTarget:
     iOS: "18.0"
   xcodeVersion: "16.0"
@@ -10,23 +10,23 @@ settings:
     SWIFT_VERSION: "6.0"
 
 packages:
-  OpenClawKit:
-    path: ../shared/OpenClawKit
+  SupportSquadAIKit:
+    path: ../shared/SupportSquadAIKit
   Swabble:
     path: ../../Swabble
 
 schemes:
-  OpenClaw:
+  SupportSquadAI:
     shared: true
     build:
       targets:
-        OpenClaw: all
+        SupportSquadAI: all
     test:
       targets:
-        - OpenClawTests
+        - SupportSquadAITests
 
 targets:
-  OpenClaw:
+  SupportSquadAI:
     type: application
     platform: iOS
     configFiles:
@@ -35,14 +35,14 @@ targets:
     sources:
       - path: Sources
     dependencies:
-      - target: OpenClawShareExtension
+      - target: SupportSquadAIShareExtension
         embed: true
-      - target: OpenClawWatchApp
-      - package: OpenClawKit
-      - package: OpenClawKit
-        product: OpenClawChatUI
-      - package: OpenClawKit
-        product: OpenClawProtocol
+      - target: SupportSquadAIWatchApp
+      - package: SupportSquadAIKit
+      - package: SupportSquadAIKit
+        product: SupportSquadAIChatUI
+      - package: SupportSquadAIKit
+        product: SupportSquadAIProtocol
       - package: Swabble
         product: SwabbleKit
       - sdk: AppIntents.framework
@@ -75,23 +75,23 @@ targets:
     settings:
       base:
         CODE_SIGN_IDENTITY: "Apple Development"
-        CODE_SIGN_ENTITLEMENTS: Sources/OpenClaw.entitlements
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_APP_BUNDLE_ID)"
-        PROVISIONING_PROFILE_SPECIFIER: "$(OPENCLAW_APP_PROFILE)"
+        CODE_SIGN_ENTITLEMENTS: Sources/SupportSquadAI.entitlements
+        CODE_SIGN_STYLE: "$(SUPPORTSQUADAI_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(SUPPORTSQUADAI_DEVELOPMENT_TEAM)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(SUPPORTSQUADAI_APP_BUNDLE_ID)"
+        PROVISIONING_PROFILE_SPECIFIER: "$(SUPPORTSQUADAI_APP_PROFILE)"
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
         ENABLE_APPINTENTS_METADATA: NO
     info:
       path: Sources/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw
+        CFBundleDisplayName: SupportSquadAI
         CFBundleIconName: AppIcon
         CFBundleURLTypes:
-          - CFBundleURLName: ai.openclaw.ios
+          - CFBundleURLName: ai.supportsquadai.ios
             CFBundleURLSchemes:
-              - openclaw
+              - supportsquadai
         CFBundleShortVersionString: "2026.2.23"
         CFBundleVersion: "20260223"
         UILaunchScreen: {}
@@ -101,17 +101,17 @@ targets:
           - audio
           - remote-notification
         BGTaskSchedulerPermittedIdentifiers:
-          - ai.openclaw.ios.bgrefresh
-        NSLocalNetworkUsageDescription: OpenClaw discovers and connects to your OpenClaw gateway on the local network.
+          - ai.supportsquadai.ios.bgrefresh
+        NSLocalNetworkUsageDescription: SupportSquadAI discovers and connects to your SupportSquadAI gateway on the local network.
         NSAppTransportSecurity:
           NSAllowsArbitraryLoadsInWebContent: true
         NSBonjourServices:
-          - _openclaw-gw._tcp
-        NSCameraUsageDescription: OpenClaw can capture photos or short video clips when requested via the gateway.
-        NSLocationWhenInUseUsageDescription: OpenClaw uses your location when you allow location sharing.
-        NSLocationAlwaysAndWhenInUseUsageDescription: OpenClaw can share your location in the background when you enable Always.
-        NSMicrophoneUsageDescription: OpenClaw needs microphone access for voice wake.
-        NSSpeechRecognitionUsageDescription: OpenClaw uses on-device speech recognition for voice wake.
+          - _supportsquadai-gw._tcp
+        NSCameraUsageDescription: SupportSquadAI can capture photos or short video clips when requested via the gateway.
+        NSLocationWhenInUseUsageDescription: SupportSquadAI uses your location when you allow location sharing.
+        NSLocationAlwaysAndWhenInUseUsageDescription: SupportSquadAI can share your location in the background when you enable Always.
+        NSMicrophoneUsageDescription: SupportSquadAI needs microphone access for voice wake.
+        NSSpeechRecognitionUsageDescription: SupportSquadAI uses on-device speech recognition for voice wake.
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationPortraitUpsideDown
@@ -123,7 +123,7 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
 
-  OpenClawShareExtension:
+  SupportSquadAIShareExtension:
     type: app-extension
     platform: iOS
     configFiles:
@@ -132,20 +132,20 @@ targets:
     sources:
       - path: ShareExtension
     dependencies:
-      - package: OpenClawKit
+      - package: SupportSquadAIKit
     settings:
       base:
         CODE_SIGN_IDENTITY: "Apple Development"
-        CODE_SIGN_STYLE: "$(OPENCLAW_CODE_SIGN_STYLE)"
-        DEVELOPMENT_TEAM: "$(OPENCLAW_DEVELOPMENT_TEAM)"
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_SHARE_BUNDLE_ID)"
-        PROVISIONING_PROFILE_SPECIFIER: "$(OPENCLAW_SHARE_PROFILE)"
+        CODE_SIGN_STYLE: "$(SUPPORTSQUADAI_CODE_SIGN_STYLE)"
+        DEVELOPMENT_TEAM: "$(SUPPORTSQUADAI_DEVELOPMENT_TEAM)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(SUPPORTSQUADAI_SHARE_BUNDLE_ID)"
+        PROVISIONING_PROFILE_SPECIFIER: "$(SUPPORTSQUADAI_SHARE_PROFILE)"
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
     info:
       path: ShareExtension/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw Share
+        CFBundleDisplayName: SupportSquadAI Share
         CFBundleShortVersionString: "2026.2.23"
         CFBundleVersion: "20260223"
         NSExtension:
@@ -158,30 +158,30 @@ targets:
               NSExtensionActivationSupportsImageWithMaxCount: 10
               NSExtensionActivationSupportsMovieWithMaxCount: 1
 
-  OpenClawWatchApp:
+  SupportSquadAIWatchApp:
     type: application.watchapp2
     platform: watchOS
     deploymentTarget: "11.0"
     sources:
       - path: WatchApp
     dependencies:
-      - target: OpenClawWatchExtension
+      - target: SupportSquadAIWatchExtension
     configFiles:
       Debug: Config/Signing.xcconfig
       Release: Config/Signing.xcconfig
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_WATCH_APP_BUNDLE_ID)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(SUPPORTSQUADAI_WATCH_APP_BUNDLE_ID)"
     info:
       path: WatchApp/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw
+        CFBundleDisplayName: SupportSquadAI
         CFBundleShortVersionString: "2026.2.23"
         CFBundleVersion: "20260223"
-        WKCompanionAppBundleIdentifier: "$(OPENCLAW_APP_BUNDLE_ID)"
+        WKCompanionAppBundleIdentifier: "$(SUPPORTSQUADAI_APP_BUNDLE_ID)"
         WKWatchKitApp: true
 
-  OpenClawWatchExtension:
+  SupportSquadAIWatchExtension:
     type: watchkit2-extension
     platform: watchOS
     deploymentTarget: "11.0"
@@ -195,38 +195,38 @@ targets:
       Release: Config/Signing.xcconfig
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: "$(OPENCLAW_WATCH_EXTENSION_BUNDLE_ID)"
+        PRODUCT_BUNDLE_IDENTIFIER: "$(SUPPORTSQUADAI_WATCH_EXTENSION_BUNDLE_ID)"
     info:
       path: WatchExtension/Info.plist
       properties:
-        CFBundleDisplayName: OpenClaw
+        CFBundleDisplayName: SupportSquadAI
         CFBundleShortVersionString: "2026.2.23"
         CFBundleVersion: "20260223"
         NSExtension:
           NSExtensionAttributes:
-            WKAppBundleIdentifier: "$(OPENCLAW_WATCH_APP_BUNDLE_ID)"
+            WKAppBundleIdentifier: "$(SUPPORTSQUADAI_WATCH_APP_BUNDLE_ID)"
           NSExtensionPointIdentifier: com.apple.watchkit
 
-  OpenClawTests:
+  SupportSquadAITests:
     type: bundle.unit-test
     platform: iOS
     sources:
       - path: Tests
     dependencies:
-      - target: OpenClaw
+      - target: SupportSquadAI
       - package: Swabble
         product: SwabbleKit
       - sdk: AppIntents.framework
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: ai.openclaw.ios.tests
+        PRODUCT_BUNDLE_IDENTIFIER: ai.supportsquadai.ios.tests
         SWIFT_VERSION: "6.0"
         SWIFT_STRICT_CONCURRENCY: complete
-        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/OpenClaw.app/OpenClaw"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/SupportSquadAI.app/SupportSquadAI"
         BUNDLE_LOADER: "$(TEST_HOST)"
     info:
       path: Tests/Info.plist
       properties:
-        CFBundleDisplayName: OpenClawTests
+        CFBundleDisplayName: SupportSquadAITests
         CFBundleShortVersionString: "2026.2.23"
         CFBundleVersion: "20260223"

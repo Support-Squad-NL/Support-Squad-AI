@@ -7,6 +7,9 @@ import { normalizeBasePath } from "../navigation.ts";
 
 export type ControlUiBootstrapState = {
   basePath: string;
+  brandName: string;
+  brandSubtitle: string;
+  docsUrl: string;
   assistantName: string;
   assistantAvatar: string | null;
   assistantAgentId: string | null;
@@ -35,6 +38,9 @@ export async function loadControlUiBootstrapConfig(state: ControlUiBootstrapStat
       return;
     }
     const parsed = (await res.json()) as ControlUiBootstrapConfig;
+    state.brandName = parsed.brandName?.trim() || state.brandName;
+    state.brandSubtitle = parsed.brandSubtitle?.trim() || state.brandSubtitle;
+    state.docsUrl = parsed.docsUrl?.trim() || state.docsUrl;
     const normalized = normalizeAssistantIdentity({
       agentId: parsed.assistantAgentId ?? null,
       name: parsed.assistantName,

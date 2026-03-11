@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/mattermost",
+  "name": "@supportsquadai/mattermost",
   "version": "2026.2.23",
-  "description": "OpenClaw Mattermost channel plugin",
+  "description": "SupportSquadAI Mattermost channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ],
@@ -20,7 +20,7 @@
       "order": 65
     },
     "install": {
-      "npmSpec": "@openclaw/mattermost",
+      "npmSpec": "@supportsquadai/mattermost",
       "localPath": "extensions/mattermost",
       "defaultChoice": "npm"
     }

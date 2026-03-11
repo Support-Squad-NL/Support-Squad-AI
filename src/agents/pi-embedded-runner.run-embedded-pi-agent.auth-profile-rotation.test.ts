@@ -3,7 +3,7 @@ import os from "node:os";
 import path from "node:path";
 import type { AssistantMessage } from "@mariozechner/pi-ai";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import type { AuthProfileFailureReason } from "./auth-profiles.js";
 import type { EmbeddedRunAttemptResult } from "./pi-embedded-runner/run/types.js";
 
@@ -23,7 +23,7 @@ vi.mock("./models-config.js", async (importOriginal) => {
   const mod = await importOriginal<typeof import("./models-config.js")>();
   return {
     ...mod,
-    ensureOpenClawModelsJson: vi.fn(async () => ({ wrote: false })),
+    ensureSupportSquadAIModelsJson: vi.fn(async () => ({ wrote: false })),
   };
 });
 
@@ -78,7 +78,7 @@ const makeAttempt = (overrides: Partial<EmbeddedRunAttemptResult>): EmbeddedRunA
   ...overrides,
 });
 
-const makeConfig = (opts?: { fallbacks?: string[]; apiKey?: string }): OpenClawConfig =>
+const makeConfig = (opts?: { fallbacks?: string[]; apiKey?: string }): SupportSquadAIConfig =>
   ({
     agents: {
       defaults: {
@@ -107,7 +107,7 @@ const makeConfig = (opts?: { fallbacks?: string[]; apiKey?: string }): OpenClawC
         },
       },
     },
-  }) satisfies OpenClawConfig;
+  }) satisfies SupportSquadAIConfig;
 
 const writeAuthStore = async (
   agentDir: string,
@@ -270,8 +270,8 @@ async function withTimedAgentWorkspace<T>(
 ) {
   vi.useFakeTimers();
   try {
-    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-agent-"));
-    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-workspace-"));
+    const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "supportsquadai-agent-"));
+    const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "supportsquadai-workspace-"));
     const now = Date.now();
     vi.setSystemTime(now);
 
@@ -289,8 +289,8 @@ async function withTimedAgentWorkspace<T>(
 async function withAgentWorkspace<T>(
   run: (ctx: { agentDir: string; workspaceDir: string }) => Promise<T>,
 ) {
-  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-agent-"));
-  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-workspace-"));
+  const agentDir = await fs.mkdtemp(path.join(os.tmpdir(), "supportsquadai-agent-"));
+  const workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "supportsquadai-workspace-"));
   try {
     return await run({ agentDir, workspaceDir });
   } finally {

@@ -1,7 +1,7 @@
-import { type OpenClawConfig, loadConfig } from "../config/config.js";
+import { type SupportSquadAIConfig, loadConfig } from "../config/config.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
-import { resolveOpenClawAgentDir } from "./agent-paths.js";
-import { ensureOpenClawModelsJson } from "./models-config.js";
+import { resolveSupportSquadAIAgentDir } from "./agent-paths.js";
+import { ensureSupportSquadAIModelsJson } from "./models-config.js";
 
 const log = createSubsystemLogger("model-catalog");
 
@@ -79,7 +79,7 @@ function createAuthStorage(AuthStorageLike: unknown, path: string) {
 }
 
 export async function loadModelCatalog(params?: {
-  config?: OpenClawConfig;
+  config?: SupportSquadAIConfig;
   useCache?: boolean;
 }): Promise<ModelCatalogEntry[]> {
   if (params?.useCache === false) {
@@ -101,16 +101,16 @@ export async function loadModelCatalog(params?: {
       });
     try {
       const cfg = params?.config ?? loadConfig();
-      await ensureOpenClawModelsJson(cfg);
+      await ensureSupportSquadAIModelsJson(cfg);
       await (
         await import("./pi-auth-json.js")
-      ).ensurePiAuthJsonFromAuthProfiles(resolveOpenClawAgentDir());
+      ).ensurePiAuthJsonFromAuthProfiles(resolveSupportSquadAIAgentDir());
       // IMPORTANT: keep the dynamic import *inside* the try/catch.
       // If this fails once (e.g. during a pnpm install that temporarily swaps node_modules),
       // we must not poison the cache with a rejected promise (otherwise all channel handlers
       // will keep failing until restart).
       const piSdk = await importPiSdk();
-      const agentDir = resolveOpenClawAgentDir();
+      const agentDir = resolveSupportSquadAIAgentDir();
       const { join } = await import("node:path");
       const authStorage = createAuthStorage(piSdk.AuthStorage, join(agentDir, "auth.json"));
       const registry = new (piSdk.ModelRegistry as unknown as {

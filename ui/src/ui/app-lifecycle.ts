@@ -24,6 +24,9 @@ type LifecycleHost = {
   client?: { stop: () => void } | null;
   connected?: boolean;
   tab: Tab;
+  brandName: string;
+  brandSubtitle: string;
+  docsUrl: string;
   assistantName: string;
   assistantAvatar: string | null;
   assistantAgentId: string | null;

@@ -1,5 +1,5 @@
 import Foundation
-import OpenClawKit
+import SupportSquadAIKit
 
 @MainActor
 final class GatewayHealthMonitor {

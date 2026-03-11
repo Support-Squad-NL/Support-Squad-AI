@@ -1,5 +1,6 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import { resolveGatewayPort } from "../config/config.js";
+import { resolveBrandDocsLink, resolveBrandName } from "../gateway/control-ui-brand.js";
 import {
   TAILSCALE_DOCS_LINES,
   TAILSCALE_EXPOSURE_OPTIONS,
@@ -21,10 +22,10 @@ import {
 type GatewayAuthChoice = "token" | "password" | "trusted-proxy";
 
 export async function promptGatewayConfig(
-  cfg: OpenClawConfig,
+  cfg: SupportSquadAIConfig,
   runtime: RuntimeEnv,
 ): Promise<{
-  config: OpenClawConfig;
+  config: SupportSquadAIConfig;
   port: number;
   token?: string;
 }> {
@@ -184,14 +185,15 @@ export async function promptGatewayConfig(
   }
 
   if (authMode === "trusted-proxy") {
+    const productName = resolveBrandName(cfg);
     note(
       [
-        "Trusted proxy mode: OpenClaw trusts user identity from a reverse proxy.",
+        `Trusted proxy mode: ${productName} trusts user identity from a reverse proxy.`,
         "The proxy must authenticate users and pass identity via headers.",
         "Only requests from specified proxy IPs will be trusted.",
         "",
         "Common use cases: Pomerium, Caddy + OAuth, Traefik + forward auth",
-        "Docs: https://docs.openclaw.ai/gateway/trusted-proxy-auth",
+        `Docs: ${resolveBrandDocsLink("/gateway/trusted-proxy-auth", cfg)}`,
       ].join("\n"),
       "Trusted Proxy Auth",
     );

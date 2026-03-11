@@ -1,4 +1,4 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import { resolveAgentModelPrimaryValue, toAgentModelListLike } from "../config/model-input.js";
 import { createSubsystemLogger } from "../logging/subsystem.js";
 import { resolveAgentConfig, resolveAgentEffectiveModelPrimary } from "./agent-scope.js";
@@ -84,7 +84,7 @@ export function findNormalizedProviderKey(
   return Object.keys(entries).find((key) => normalizeProviderId(key) === providerKey);
 }
 
-export function isCliProvider(provider: string, cfg?: OpenClawConfig): boolean {
+export function isCliProvider(provider: string, cfg?: SupportSquadAIConfig): boolean {
   const normalized = normalizeProviderId(provider);
   if (normalized === "claude-cli") {
     return true;
@@ -186,7 +186,7 @@ export function resolveAllowlistModelKey(raw: string, defaultProvider: string): 
 }
 
 export function buildConfiguredAllowlistKeys(params: {
-  cfg: OpenClawConfig | undefined;
+  cfg: SupportSquadAIConfig | undefined;
   defaultProvider: string;
 }): Set<string> | null {
   const rawAllowlist = Object.keys(params.cfg?.agents?.defaults?.models ?? {});
@@ -205,7 +205,7 @@ export function buildConfiguredAllowlistKeys(params: {
 }
 
 export function buildModelAliasIndex(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   defaultProvider: string;
 }): ModelAliasIndex {
   const byAlias = new Map<string, { alias: string; ref: ModelRef }>();
@@ -256,7 +256,7 @@ export function resolveModelRefFromString(params: {
 }
 
 export function resolveConfiguredModelRef(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   defaultProvider: string;
   defaultModel: string;
 }): ModelRef {
@@ -294,7 +294,7 @@ export function resolveConfiguredModelRef(params: {
 }
 
 export function resolveDefaultModelForAgent(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   agentId?: string;
 }): ModelRef {
   const agentModelOverride = params.agentId
@@ -324,7 +324,7 @@ export function resolveDefaultModelForAgent(params: {
 }
 
 export function resolveSubagentConfiguredModelSelection(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   agentId: string;
 }): string | undefined {
   const agentConfig = resolveAgentConfig(params.cfg, params.agentId);
@@ -336,7 +336,7 @@ export function resolveSubagentConfiguredModelSelection(params: {
 }
 
 export function resolveSubagentSpawnModelSelection(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   agentId: string;
   modelOverride?: unknown;
 }): string {
@@ -356,7 +356,7 @@ export function resolveSubagentSpawnModelSelection(params: {
 }
 
 export function buildAllowedModelSet(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   catalog: ModelCatalogEntry[];
   defaultProvider: string;
   defaultModel?: string;
@@ -439,7 +439,7 @@ export type ModelRefStatus = {
 };
 
 export function getModelRefStatus(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   catalog: ModelCatalogEntry[];
   ref: ModelRef;
   defaultProvider: string;
@@ -461,7 +461,7 @@ export function getModelRefStatus(params: {
 }
 
 export function resolveAllowedModelRef(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   catalog: ModelCatalogEntry[];
   raw: string;
   defaultProvider: string;
@@ -504,7 +504,7 @@ export function resolveAllowedModelRef(params: {
 }
 
 export function resolveThinkingDefault(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   provider: string;
   model: string;
   catalog?: ModelCatalogEntry[];
@@ -542,7 +542,7 @@ export function resolveReasoningDefault(params: {
  * Returns null if hooks.gmail.model is not set.
  */
 export function resolveHooksGmailModel(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   defaultProvider: string;
 }): ModelRef | null {
   const hooksModel = params.cfg.hooks?.gmail?.model;

@@ -1,14 +1,14 @@
 import Foundation
 import Testing
-@testable import OpenClaw
+@testable import SupportSquadAI
 
 private struct KeychainEntry: Hashable {
     let service: String
     let account: String
 }
 
-private let gatewayService = "ai.openclaw.gateway"
-private let nodeService = "ai.openclaw.node"
+private let gatewayService = "ai.supportsquadai.gateway"
+private let nodeService = "ai.supportsquadai.node"
 private let instanceIdEntry = KeychainEntry(service: nodeService, account: "instanceId")
 private let preferredGatewayEntry = KeychainEntry(service: gatewayService, account: "preferredStableID")
 private let lastGatewayEntry = KeychainEntry(service: gatewayService, account: "lastDiscoveredStableID")

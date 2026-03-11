@@ -1,15 +1,15 @@
-# OpenClaw Security & Trust
+# SupportSquadAI Security & Trust
 
-**Live:** [trust.openclaw.ai](https://trust.openclaw.ai)
+**Live:** [trust.supportsquadai.ai](https://trust.supportsquadai.ai)
 
 ## Documents
 
-- [Threat Model](./THREAT-MODEL-ATLAS.md) - MITRE ATLAS-based threat model for the OpenClaw ecosystem
+- [Threat Model](./THREAT-MODEL-ATLAS.md) - MITRE ATLAS-based threat model for the SupportSquadAI ecosystem
 - [Contributing to the Threat Model](./CONTRIBUTING-THREAT-MODEL.md) - How to add threats, mitigations, and attack chains
 
 ## Reporting Vulnerabilities
 
-See the [Trust page](https://trust.openclaw.ai) for full reporting instructions covering all repos.
+See the [Trust page](https://trust.supportsquadai.ai) for full reporting instructions covering all repos.
 
 ## Contact
 

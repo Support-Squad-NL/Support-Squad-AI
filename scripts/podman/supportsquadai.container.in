@@ -1,0 +1,26 @@
+# SupportSquadAI gateway — Podman Quadlet (rootless)
+# Installed by setup-podman.sh into supportsquadai's ~/.config/containers/systemd/
+# {{SUPPORTSQUADAI_HOME}} is replaced at install time.
+
+[Unit]
+Description=SupportSquadAI gateway (rootless Podman)
+
+[Container]
+Image=supportsquadai:local
+ContainerName=supportsquadai
+UserNS=keep-id
+Volume={{SUPPORTSQUADAI_HOME}}/.supportsquadai:/home/node/.supportsquadai
+EnvironmentFile={{SUPPORTSQUADAI_HOME}}/.supportsquadai/.env
+Environment=HOME=/home/node
+Environment=TERM=xterm-256color
+PublishPort=18789:18789
+PublishPort=18790:18790
+Pull=never
+Exec=node dist/index.js gateway --bind lan --port 18789
+
+[Service]
+TimeoutStartSec=300
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

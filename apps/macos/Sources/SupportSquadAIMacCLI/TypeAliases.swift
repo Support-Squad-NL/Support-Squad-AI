@@ -1,0 +1,5 @@
+import SupportSquadAIKit
+import SupportSquadAIProtocol
+
+typealias ProtoAnyCodable = SupportSquadAIProtocol.AnyCodable
+typealias KitAnyCodable = SupportSquadAIKit.AnyCodable

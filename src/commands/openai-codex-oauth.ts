@@ -1,5 +1,6 @@
 import type { OAuthCredentials } from "@mariozechner/pi-ai";
 import { loginOpenAICodex } from "@mariozechner/pi-ai";
+import { resolveBrandDocsLink } from "../gateway/control-ui-brand.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 import { createVpsAwareOAuthHandlers } from "./oauth-flow.js";
@@ -49,7 +50,10 @@ export async function loginOpenAICodexOAuth(params: {
   } catch (err) {
     spin.stop("OpenAI OAuth failed");
     runtime.error(String(err));
-    await prompter.note("Trouble with OAuth? See https://docs.openclaw.ai/start/faq", "OAuth help");
+    await prompter.note(
+      `Trouble with OAuth? See ${resolveBrandDocsLink("/start/faq")}`,
+      "OAuth help",
+    );
     throw err;
   }
 }

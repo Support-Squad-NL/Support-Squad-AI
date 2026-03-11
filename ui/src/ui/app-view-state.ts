@@ -57,6 +57,9 @@ export type AppViewState = {
   lastError: string | null;
   lastErrorCode: string | null;
   eventLog: EventLogEntry[];
+  brandName: string;
+  brandSubtitle: string;
+  docsUrl: string;
   assistantName: string;
   assistantAvatar: string | null;
   assistantAgentId: string | null;

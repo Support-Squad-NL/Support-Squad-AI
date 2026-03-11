@@ -1,5 +1,6 @@
 import { formatCliCommand } from "../../../cli/command-format.js";
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { SupportSquadAIConfig } from "../../../config/config.js";
+import { resolveBrandSiteUrl } from "../../../gateway/control-ui-brand.js";
 import { DEFAULT_ACCOUNT_ID } from "../../../routing/session-key.js";
 import {
   listTelegramAccountIds,
@@ -23,6 +24,7 @@ import {
 } from "./helpers.js";
 
 const channel = "telegram" as const;
+const WEBSITE_URL = resolveBrandSiteUrl();
 
 async function noteTelegramTokenHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
@@ -32,7 +34,7 @@ async function noteTelegramTokenHelp(prompter: WizardPrompter): Promise<void> {
       "3) Copy the token (looks like 123456:ABC...)",
       "Tip: you can also set TELEGRAM_BOT_TOKEN in your env.",
       `Docs: ${formatDocsLink("/telegram")}`,
-      "Website: https://openclaw.ai",
+      `Website: ${WEBSITE_URL}`,
     ].join("\n"),
     "Telegram bot token",
   );
@@ -41,11 +43,11 @@ async function noteTelegramTokenHelp(prompter: WizardPrompter): Promise<void> {
 async function noteTelegramUserIdHelp(prompter: WizardPrompter): Promise<void> {
   await prompter.note(
     [
-      `1) DM your bot, then read from.id in \`${formatCliCommand("openclaw logs --follow")}\` (safest)`,
+      `1) DM your bot, then read from.id in \`${formatCliCommand("supportsquadai logs --follow")}\` (safest)`,
       "2) Or call https://api.telegram.org/bot<bot_token>/getUpdates and read message.from.id",
       "3) Third-party: DM @userinfobot or @getidsbot",
       `Docs: ${formatDocsLink("/telegram")}`,
-      "Website: https://openclaw.ai",
+      `Website: ${WEBSITE_URL}`,
     ].join("\n"),
     "Telegram user id",
   );
@@ -64,10 +66,10 @@ export function parseTelegramAllowFromId(raw: string): string | null {
 }
 
 async function promptTelegramAllowFrom(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   prompter: WizardPrompter;
   accountId: string;
-}): Promise<OpenClawConfig> {
+}): Promise<SupportSquadAIConfig> {
   const { cfg, prompter, accountId } = params;
   const resolved = resolveTelegramAccount({ cfg, accountId });
   const existingAllowFrom = resolved.config.allowFrom ?? [];
@@ -117,10 +119,10 @@ async function promptTelegramAllowFrom(params: {
 }
 
 async function promptTelegramAllowFromForAccount(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   prompter: WizardPrompter;
   accountId?: string;
-}): Promise<OpenClawConfig> {
+}): Promise<SupportSquadAIConfig> {
   const accountId = resolveOnboardingAccountId({
     accountId: params.accountId,
     defaultAccountId: resolveDefaultTelegramAccountId(params.cfg),

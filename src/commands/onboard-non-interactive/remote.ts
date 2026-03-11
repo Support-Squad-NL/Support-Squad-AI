@@ -1,7 +1,8 @@
 import { formatCliCommand } from "../../cli/command-format.js";
-import type { OpenClawConfig } from "../../config/config.js";
+import type { SupportSquadAIConfig } from "../../config/config.js";
 import { writeConfigFile } from "../../config/config.js";
 import { logConfigUpdated } from "../../config/logging.js";
+import { resolveBrandDocsLink } from "../../gateway/control-ui-brand.js";
 import type { RuntimeEnv } from "../../runtime.js";
 import { applyWizardMetadata } from "../onboard-helpers.js";
 import type { OnboardOptions } from "../onboard-types.js";
@@ -9,7 +10,7 @@ import type { OnboardOptions } from "../onboard-types.js";
 export async function runNonInteractiveOnboardingRemote(params: {
   opts: OnboardOptions;
   runtime: RuntimeEnv;
-  baseConfig: OpenClawConfig;
+  baseConfig: SupportSquadAIConfig;
 }) {
   const { opts, runtime, baseConfig } = params;
   const mode = "remote" as const;
@@ -21,7 +22,7 @@ export async function runNonInteractiveOnboardingRemote(params: {
     return;
   }
 
-  let nextConfig: OpenClawConfig = {
+  let nextConfig: SupportSquadAIConfig = {
     ...baseConfig,
     gateway: {
       ...baseConfig.gateway,
@@ -47,7 +48,7 @@ export async function runNonInteractiveOnboardingRemote(params: {
     runtime.log(`Remote gateway: ${remoteUrl}`);
     runtime.log(`Auth: ${payload.auth}`);
     runtime.log(
-      `Tip: run \`${formatCliCommand("openclaw configure --section web")}\` to store your Brave API key for web_search. Docs: https://docs.openclaw.ai/tools/web`,
+      `Tip: run \`${formatCliCommand("supportsquadai configure --section web")}\` to store your Brave API key for web_search. Docs: ${resolveBrandDocsLink("/tools/web")}`,
     );
   }
 }

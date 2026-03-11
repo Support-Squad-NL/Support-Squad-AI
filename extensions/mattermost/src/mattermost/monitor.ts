@@ -1,10 +1,10 @@
 import type {
   ChannelAccountSnapshot,
   ChatType,
-  OpenClawConfig,
+  SupportSquadAIConfig,
   ReplyPayload,
   RuntimeEnv,
-} from "openclaw/plugin-sdk";
+} from "supportsquadai/plugin-sdk";
 import {
   buildAgentMediaPayload,
   createReplyPrefixOptions,
@@ -21,7 +21,7 @@ import {
   resolveChannelMediaMaxBytes,
   warnMissingProviderGroupPolicyFallbackOnce,
   type HistoryEntry,
-} from "openclaw/plugin-sdk";
+} from "supportsquadai/plugin-sdk";
 import { getMattermostRuntime } from "../runtime.js";
 import { resolveMattermostAccount } from "./accounts.js";
 import {
@@ -53,7 +53,7 @@ export type MonitorMattermostOpts = {
   botToken?: string;
   baseUrl?: string;
   accountId?: string;
-  config?: OpenClawConfig;
+  config?: SupportSquadAIConfig;
   runtime?: RuntimeEnv;
   abortSignal?: AbortSignal;
   statusSink?: (patch: Partial<ChannelAccountSnapshot>) => void;

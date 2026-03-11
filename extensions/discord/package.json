@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/discord",
+  "name": "@supportsquadai/discord",
   "version": "2026.2.23",
-  "description": "OpenClaw Discord channel plugin",
+  "description": "SupportSquadAI Discord channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,6 +1,7 @@
 import { html, nothing } from "lit";
 import { parseAgentSessionKey } from "../../../src/routing/session-key.js";
 import { t } from "../i18n/index.ts";
+import { resolveDocsUrl } from "./brand.ts";
 import { refreshChatAvatar } from "./app-chat.ts";
 import { renderUsageTab } from "./app-render-usage-tab.ts";
 import { renderChatControls, renderTab, renderThemeToggle } from "./app-render.helpers.ts";
@@ -222,11 +223,14 @@ export function renderApp(state: AppViewState) {
           </button>
           <div class="brand">
             <div class="brand-logo">
-              <img src=${basePath ? `${basePath}/favicon.svg` : "/favicon.svg"} alt="OpenClaw" />
+                <img
+                  src=${basePath ? `${basePath}/favicon.svg` : "/favicon.svg"}
+                  alt=${state.brandName}
+                />
             </div>
             <div class="brand-text">
-              <div class="brand-title">OPENCLAW</div>
-              <div class="brand-sub">Gateway Dashboard</div>
+                <div class="brand-title">${state.brandName}</div>
+                <div class="brand-sub">${state.brandSubtitle}</div>
             </div>
           </div>
         </div>
@@ -273,7 +277,7 @@ export function renderApp(state: AppViewState) {
           <div class="nav-group__items">
             <a
               class="nav-item nav-item--external"
-              href="https://docs.openclaw.ai"
+              href=${resolveDocsUrl(state.docsUrl)}
               target="_blank"
               rel="noreferrer"
               title="${t("common.docs")} (opens in new tab)"
@@ -323,6 +327,7 @@ export function renderApp(state: AppViewState) {
                 cronEnabled: state.cronStatus?.enabled ?? null,
                 cronNext,
                 lastChannelsRefresh: state.channelsLastSuccess,
+                docsUrl: state.docsUrl,
                 onSettingsChange: (next) => state.applySettings(next),
                 onPasswordChange: (next) => (state.password = next),
                 onSessionKeyChange: (next) => {

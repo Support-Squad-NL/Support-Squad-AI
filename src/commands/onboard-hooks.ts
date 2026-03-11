@@ -1,21 +1,22 @@
 import { resolveAgentWorkspaceDir, resolveDefaultAgentId } from "../agents/agent-scope.js";
 import { formatCliCommand } from "../cli/command-format.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
+import { resolveBrandDocsLink } from "../gateway/control-ui-brand.js";
 import { buildWorkspaceHookStatus } from "../hooks/hooks-status.js";
 import type { RuntimeEnv } from "../runtime.js";
 import type { WizardPrompter } from "../wizard/prompts.js";
 
 export async function setupInternalHooks(
-  cfg: OpenClawConfig,
+  cfg: SupportSquadAIConfig,
   runtime: RuntimeEnv,
   prompter: WizardPrompter,
-): Promise<OpenClawConfig> {
+): Promise<SupportSquadAIConfig> {
   await prompter.note(
     [
       "Hooks let you automate actions when agent commands are issued.",
       "Example: Save session context to memory when you issue /new or /reset.",
       "",
-      "Learn more: https://docs.openclaw.ai/automation/hooks",
+      `Learn more: ${resolveBrandDocsLink("/automation/hooks")}`,
     ].join("\n"),
     "Hooks",
   );
@@ -58,7 +59,7 @@ export async function setupInternalHooks(
     entries[name] = { enabled: true };
   }
 
-  const next: OpenClawConfig = {
+  const next: SupportSquadAIConfig = {
     ...cfg,
     hooks: {
       ...cfg.hooks,
@@ -74,9 +75,9 @@ export async function setupInternalHooks(
       `Enabled ${selected.length} hook${selected.length > 1 ? "s" : ""}: ${selected.join(", ")}`,
       "",
       "You can manage hooks later with:",
-      `  ${formatCliCommand("openclaw hooks list")}`,
-      `  ${formatCliCommand("openclaw hooks enable <name>")}`,
-      `  ${formatCliCommand("openclaw hooks disable <name>")}`,
+      `  ${formatCliCommand("supportsquadai hooks list")}`,
+      `  ${formatCliCommand("supportsquadai hooks enable <name>")}`,
+      `  ${formatCliCommand("supportsquadai hooks disable <name>")}`,
     ].join("\n"),
     "Hooks Configured",
   );

@@ -1,6 +1,6 @@
-# @openclaw/voice-call
+# @supportsquadai/voice-call
 
-Official Voice Call plugin for **OpenClaw**.
+Official Voice Call plugin for **SupportSquadAI**.
 
 Providers:
 
@@ -9,15 +9,15 @@ Providers:
 - **Plivo** (Voice API + XML transfer + GetInput speech)
 - **Mock** (dev/no network)
 
-Docs: `https://docs.openclaw.ai/plugins/voice-call`
-Plugin system: `https://docs.openclaw.ai/plugin`
+Docs: `https://docs.supportsquadai.ai/plugins/voice-call`
+Plugin system: `https://docs.supportsquadai.ai/plugin`
 
 ## Install (local dev)
 
-### Option A: install via OpenClaw (recommended)
+### Option A: install via SupportSquadAI (recommended)
 
 ```bash
-openclaw plugins install @openclaw/voice-call
+supportsquadai plugins install @supportsquadai/voice-call
 ```
 
 Restart the Gateway afterwards.
@@ -25,9 +25,9 @@ Restart the Gateway afterwards.
 ### Option B: copy into your global extensions folder (dev)
 
 ```bash
-mkdir -p ~/.openclaw/extensions
-cp -R extensions/voice-call ~/.openclaw/extensions/voice-call
-cd ~/.openclaw/extensions/voice-call && pnpm install
+mkdir -p ~/.supportsquadai/extensions
+cp -R extensions/voice-call ~/.supportsquadai/extensions/voice-call
+cd ~/.supportsquadai/extensions/voice-call && pnpm install
 ```
 
 ## Config
@@ -143,13 +143,13 @@ Notes:
 ## CLI
 
 ```bash
-openclaw voicecall call --to "+15555550123" --message "Hello from OpenClaw"
-openclaw voicecall continue --call-id <id> --message "Any questions?"
-openclaw voicecall speak --call-id <id> --message "One moment"
-openclaw voicecall end --call-id <id>
-openclaw voicecall status --call-id <id>
-openclaw voicecall tail
-openclaw voicecall expose --mode funnel
+supportsquadai voicecall call --to "+15555550123" --message "Hello from SupportSquadAI"
+supportsquadai voicecall continue --call-id <id> --message "Any questions?"
+supportsquadai voicecall speak --call-id <id> --message "One moment"
+supportsquadai voicecall end --call-id <id>
+supportsquadai voicecall status --call-id <id>
+supportsquadai voicecall tail
+supportsquadai voicecall expose --mode funnel
 ```
 
 ## Tool

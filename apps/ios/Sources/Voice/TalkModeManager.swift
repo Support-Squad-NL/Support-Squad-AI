@@ -1,7 +1,7 @@
 import AVFAudio
-import OpenClawChatUI
-import OpenClawKit
-import OpenClawProtocol
+import SupportSquadAIChatUI
+import SupportSquadAIKit
+import SupportSquadAIProtocol
 import Foundation
 import Observation
 import OSLog
@@ -16,7 +16,7 @@ import Speech
 final class TalkModeManager: NSObject {
     private typealias SpeechRequest = SFSpeechAudioBufferRecognitionRequest
     private static let defaultModelIdFallback = "eleven_v3"
-    private static let redactedConfigSentinel = "__OPENCLAW_REDACTED__"
+    private static let redactedConfigSentinel = "__SUPPORTSQUADAI_REDACTED__"
     var isEnabled: Bool = false
     var isListening: Bool = false
     var isSpeaking: Bool = false
@@ -39,7 +39,7 @@ final class TalkModeManager: NSObject {
     private var resumeContinuousAfterPTT: Bool = false
     private var activePTTCaptureId: String?
     private var pttAutoStopEnabled: Bool = false
-    private var pttCompletion: CheckedContinuation<OpenClawTalkPTTStopPayload, Never>?
+    private var pttCompletion: CheckedContinuation<SupportSquadAITalkPTTStopPayload, Never>?
     private var pttTimeoutTask: Task<Void, Never>?
 
     private let allowSimulatorCapture: Bool
@@ -206,7 +206,7 @@ final class TalkModeManager: NSObject {
         self.pttTimeoutTask = nil
         self.pttAutoStopEnabled = false
         if pendingPTT {
-            let payload = OpenClawTalkPTTStopPayload(
+            let payload = SupportSquadAITalkPTTStopPayload(
                 captureId: pendingCaptureId,
                 transcript: nil,
                 status: "cancelled")
@@ -268,7 +268,7 @@ final class TalkModeManager: NSObject {
         self.stopSpeaking()
     }
 
-    func beginPushToTalk() async throws -> OpenClawTalkPTTStartPayload {
+    func beginPushToTalk() async throws -> SupportSquadAITalkPTTStartPayload {
         guard self.gatewayConnected else {
             self.statusText = "Offline"
             throw NSError(domain: "TalkMode", code: 7, userInfo: [
@@ -276,7 +276,7 @@ final class TalkModeManager: NSObject {
             ])
         }
         if self.isPushToTalkActive, let captureId = self.activePTTCaptureId {
-            return OpenClawTalkPTTStartPayload(captureId: captureId)
+            return SupportSquadAITalkPTTStartPayload(captureId: captureId)
         }
 
         self.stopSpeaking(storeInterruption: false)
@@ -332,13 +332,13 @@ final class TalkModeManager: NSObject {
             throw error
         }
 
-        return OpenClawTalkPTTStartPayload(captureId: captureId)
+        return SupportSquadAITalkPTTStartPayload(captureId: captureId)
     }
 
-    func endPushToTalk() async -> OpenClawTalkPTTStopPayload {
+    func endPushToTalk() async -> SupportSquadAITalkPTTStopPayload {
         let captureId = self.activePTTCaptureId ?? UUID().uuidString
         guard self.isPushToTalkActive else {
-            let payload = OpenClawTalkPTTStopPayload(
+            let payload = SupportSquadAITalkPTTStopPayload(
                 captureId: captureId,
                 transcript: nil,
                 status: "idle")
@@ -365,7 +365,7 @@ final class TalkModeManager: NSObject {
             }
             self.resumeContinuousAfterPTT = false
             self.activePTTCaptureId = nil
-            let payload = OpenClawTalkPTTStopPayload(
+            let payload = SupportSquadAITalkPTTStopPayload(
                 captureId: captureId,
                 transcript: nil,
                 status: "empty")
@@ -380,7 +380,7 @@ final class TalkModeManager: NSObject {
             }
             self.resumeContinuousAfterPTT = false
             self.activePTTCaptureId = nil
-            let payload = OpenClawTalkPTTStopPayload(
+            let payload = SupportSquadAITalkPTTStopPayload(
                 captureId: captureId,
                 transcript: transcript,
                 status: "offline")
@@ -394,7 +394,7 @@ final class TalkModeManager: NSObject {
         }
         self.resumeContinuousAfterPTT = false
         self.activePTTCaptureId = nil
-        let payload = OpenClawTalkPTTStopPayload(
+        let payload = SupportSquadAITalkPTTStopPayload(
             captureId: captureId,
             transcript: transcript,
             status: "queued")
@@ -402,14 +402,14 @@ final class TalkModeManager: NSObject {
         return payload
     }
 
-    func runPushToTalkOnce(maxDurationSeconds: TimeInterval = 12) async throws -> OpenClawTalkPTTStopPayload {
+    func runPushToTalkOnce(maxDurationSeconds: TimeInterval = 12) async throws -> SupportSquadAITalkPTTStopPayload {
         if self.pttCompletion != nil {
             _ = await self.cancelPushToTalk()
         }
 
         if self.isPushToTalkActive {
             let captureId = self.activePTTCaptureId ?? UUID().uuidString
-            return OpenClawTalkPTTStopPayload(
+            return SupportSquadAITalkPTTStopPayload(
                 captureId: captureId,
                 transcript: nil,
                 status: "busy")
@@ -425,10 +425,10 @@ final class TalkModeManager: NSObject {
         }
     }
 
-    func cancelPushToTalk() async -> OpenClawTalkPTTStopPayload {
+    func cancelPushToTalk() async -> SupportSquadAITalkPTTStopPayload {
         let captureId = self.activePTTCaptureId ?? UUID().uuidString
         guard self.isPushToTalkActive else {
-            let payload = OpenClawTalkPTTStopPayload(
+            let payload = SupportSquadAITalkPTTStopPayload(
                 captureId: captureId,
                 transcript: nil,
                 status: "idle")
@@ -455,7 +455,7 @@ final class TalkModeManager: NSObject {
         self.activePTTCaptureId = nil
         self.statusText = "Ready"
 
-        let payload = OpenClawTalkPTTStopPayload(
+        let payload = SupportSquadAITalkPTTStopPayload(
             captureId: captureId,
             transcript: nil,
             status: "cancelled")
@@ -726,7 +726,7 @@ final class TalkModeManager: NSObject {
         _ = await self.endPushToTalk()
     }
 
-    private func finishPTTOnce(_ payload: OpenClawTalkPTTStopPayload) {
+    private func finishPTTOnce(_ payload: SupportSquadAITalkPTTStopPayload) {
         guard let continuation = self.pttCompletion else { return }
         self.pttCompletion = nil
         continuation.resume(returning: payload)
@@ -1426,7 +1426,7 @@ final class TalkModeManager: NSObject {
         for await evt in stream {
             if Task.isCancelled { return }
             guard evt.event == "agent", let payload = evt.payload else { continue }
-            guard let agentEvent = try? GatewayPayloadDecoding.decode(payload, as: OpenClawAgentEventPayload.self) else {
+            guard let agentEvent = try? GatewayPayloadDecoding.decode(payload, as: SupportSquadAIAgentEventPayload.self) else {
                 continue
             }
             guard agentEvent.runId == runId, agentEvent.stream == "assistant" else { continue }

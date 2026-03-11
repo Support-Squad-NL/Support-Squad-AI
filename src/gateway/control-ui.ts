@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import { resolveControlUiRootSync } from "../infra/control-ui-assets.js";
 import { isWithinDir } from "../infra/path-safety.js";
 import { openVerifiedFileSync } from "../infra/safe-open-sync.js";
@@ -11,6 +11,7 @@ import {
   CONTROL_UI_BOOTSTRAP_CONFIG_PATH,
   type ControlUiBootstrapConfig,
 } from "./control-ui-contract.js";
+import { resolveControlUiBrand } from "./control-ui-brand.js";
 import { buildControlUiCspHeader } from "./control-ui-csp.js";
 import {
   buildControlUiAvatarUrl,
@@ -23,7 +24,7 @@ const ROOT_PREFIX = "/";
 
 export type ControlUiRequestOptions = {
   basePath?: string;
-  config?: OpenClawConfig;
+  config?: SupportSquadAIConfig;
   agentId?: string;
   root?: ControlUiRootState;
 };
@@ -323,6 +324,7 @@ export function handleControlUiHttpRequest(
     : CONTROL_UI_BOOTSTRAP_CONFIG_PATH;
   if (pathname === bootstrapConfigPath) {
     const config = opts?.config;
+    const brand = resolveControlUiBrand(config);
     const identity = config
       ? resolveAssistantIdentity({ cfg: config, agentId: opts?.agentId })
       : DEFAULT_ASSISTANT_IDENTITY;
@@ -340,6 +342,9 @@ export function handleControlUiHttpRequest(
     }
     sendJson(res, 200, {
       basePath,
+      brandName: brand.name,
+      brandSubtitle: brand.subtitle,
+      docsUrl: brand.docsUrl,
       assistantName: identity.name,
       assistantAvatar: avatarValue ?? identity.avatar,
       assistantAgentId: identity.agentId,

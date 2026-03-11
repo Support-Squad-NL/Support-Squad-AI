@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import {
   loadConfig,
   resolveConfigPath,
@@ -21,6 +21,7 @@ import {
   resolveLeastPrivilegeOperatorScopesForMethod,
   type OperatorScope,
 } from "./method-scopes.js";
+import { resolveBrandDocsLink } from "./control-ui-brand.js";
 import { isSecureWebSocketUrl } from "./net.js";
 import { PROTOCOL_VERSION } from "./protocol/index.js";
 
@@ -29,7 +30,7 @@ type CallGatewayBaseOptions = {
   token?: string;
   password?: string;
   tlsFingerprint?: string;
-  config?: OpenClawConfig;
+  config?: SupportSquadAIConfig;
   method: string;
   params?: unknown;
   expectFinal?: boolean;
@@ -107,7 +108,7 @@ export function ensureExplicitGatewayAuth(params: {
 }
 
 export function buildGatewayConnectionDetails(
-  options: { config?: OpenClawConfig; url?: string; configPath?: string } = {},
+  options: { config?: SupportSquadAIConfig; url?: string; configPath?: string } = {},
 ): GatewayConnectionDetails {
   const config = options.config ?? loadConfig();
   const configPath =
@@ -154,8 +155,8 @@ export function buildGatewayConnectionDetails(
         "Safe remote access defaults:",
         "- keep gateway.bind=loopback and use an SSH tunnel (ssh -N -L 18789:127.0.0.1:18789 user@gateway-host)",
         "- or use Tailscale Serve/Funnel for HTTPS remote access",
-        "Doctor: openclaw doctor --fix",
-        "Docs: https://docs.openclaw.ai/gateway/remote",
+        "Doctor: supportsquadai doctor --fix",
+        `Docs: ${resolveBrandDocsLink("/gateway/remote")}`,
       ].join("\n"),
     );
   }
@@ -187,7 +188,7 @@ type GatewayRemoteSettings = {
 };
 
 type ResolvedGatewayCallContext = {
-  config: OpenClawConfig;
+  config: SupportSquadAIConfig;
   configPath: string;
   isRemoteMode: boolean;
   remote?: GatewayRemoteSettings;

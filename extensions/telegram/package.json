@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/telegram",
+  "name": "@supportsquadai/telegram",
   "version": "2026.2.23",
   "private": true,
-  "description": "OpenClaw Telegram channel plugin",
+  "description": "SupportSquadAI Telegram channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ]

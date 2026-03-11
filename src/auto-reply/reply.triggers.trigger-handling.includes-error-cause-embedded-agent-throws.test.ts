@@ -88,7 +88,7 @@ describe("trigger handling", () => {
 
       const text = Array.isArray(res) ? res[0]?.text : res?.text;
       expect(text).toBe(
-        "⚠️ Agent failed before reply: sandbox is not defined.\nLogs: openclaw logs --follow",
+        "⚠️ Agent failed before reply: sandbox is not defined.\nLogs: supportsquadai logs --follow",
       );
       expect(runEmbeddedPiAgentMock).toHaveBeenCalledOnce();
     });
@@ -194,7 +194,7 @@ describe("trigger handling", () => {
 
   it("runs /compact as a gated command", async () => {
     await withTempHome(async (home) => {
-      const storePath = join(tmpdir(), `openclaw-session-test-${Date.now()}.json`);
+      const storePath = join(tmpdir(), `supportsquadai-session-test-${Date.now()}.json`);
       const cfg = makeCfg(home);
       cfg.session = { ...cfg.session, store: storePath };
       mockSuccessfulCompaction();

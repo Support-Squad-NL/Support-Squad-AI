@@ -4,7 +4,7 @@ import {
   resolveSandboxToolPolicyForAgent,
 } from "../agents/sandbox.js";
 import { normalizeAnyChannelId } from "../channels/registry.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import { loadConfig } from "../config/config.js";
 import {
   loadSessionStore,
@@ -12,6 +12,7 @@ import {
   resolveMainSessionKey,
   resolveStorePath,
 } from "../config/sessions.js";
+import { resolveBrandDocsLink } from "../gateway/control-ui-brand.js";
 import {
   buildAgentMainSessionKey,
   normalizeAgentId,
@@ -30,10 +31,10 @@ type SandboxExplainOptions = {
   json: boolean;
 };
 
-const SANDBOX_DOCS_URL = "https://docs.openclaw.ai/sandbox";
+const SANDBOX_DOCS_URL = resolveBrandDocsLink("/sandbox");
 
 function normalizeExplainSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   agentId: string;
   session?: string;
 }): string {
@@ -57,7 +58,7 @@ function normalizeExplainSessionKey(params: {
 }
 
 function inferProviderFromSessionKey(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   sessionKey: string;
 }): string | undefined {
   const parsed = parseAgentSessionKey(params.sessionKey);
@@ -87,7 +88,7 @@ function inferProviderFromSessionKey(params: {
 }
 
 function resolveActiveChannel(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   agentId: string;
   sessionKey: string;
 }): string | undefined {
@@ -331,7 +332,7 @@ export async function sandboxExplainCommand(
     lines.push(`  - ${key}`);
   }
   lines.push("");
-  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "docs.openclaw.ai/sandbox")}`);
+  lines.push(`${key("Docs:")} ${formatDocsLink("/sandbox", "docs.supportsquadai.ai/sandbox")}`);
 
   runtime.log(`${lines.join("\n")}\n`);
 }

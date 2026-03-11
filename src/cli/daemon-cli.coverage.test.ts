@@ -97,15 +97,15 @@ describe("daemon-cli coverage", () => {
 
   beforeEach(() => {
     envSnapshot = captureEnv([
-      "OPENCLAW_STATE_DIR",
-      "OPENCLAW_CONFIG_PATH",
-      "OPENCLAW_GATEWAY_PORT",
-      "OPENCLAW_PROFILE",
+      "SUPPORTSQUADAI_STATE_DIR",
+      "SUPPORTSQUADAI_CONFIG_PATH",
+      "SUPPORTSQUADAI_GATEWAY_PORT",
+      "SUPPORTSQUADAI_PROFILE",
     ]);
-    process.env.OPENCLAW_STATE_DIR = "/tmp/openclaw-cli-state";
-    process.env.OPENCLAW_CONFIG_PATH = "/tmp/openclaw-cli-state/openclaw.json";
-    delete process.env.OPENCLAW_GATEWAY_PORT;
-    delete process.env.OPENCLAW_PROFILE;
+    process.env.SUPPORTSQUADAI_STATE_DIR = "/tmp/supportsquadai-cli-state";
+    process.env.SUPPORTSQUADAI_CONFIG_PATH = "/tmp/supportsquadai-cli-state/supportsquadai.json";
+    delete process.env.SUPPORTSQUADAI_GATEWAY_PORT;
+    delete process.env.SUPPORTSQUADAI_PROFILE;
     serviceReadCommand.mockResolvedValue(null);
   });
 
@@ -133,10 +133,10 @@ describe("daemon-cli coverage", () => {
     serviceReadCommand.mockResolvedValueOnce({
       programArguments: ["/bin/node", "cli", "gateway", "--port", "19001"],
       environment: {
-        OPENCLAW_PROFILE: "dev",
-        OPENCLAW_STATE_DIR: "/tmp/openclaw-daemon-state",
-        OPENCLAW_CONFIG_PATH: "/tmp/openclaw-daemon-state/openclaw.json",
-        OPENCLAW_GATEWAY_PORT: "19001",
+        SUPPORTSQUADAI_PROFILE: "dev",
+        SUPPORTSQUADAI_STATE_DIR: "/tmp/supportsquadai-daemon-state",
+        SUPPORTSQUADAI_CONFIG_PATH: "/tmp/supportsquadai-daemon-state/supportsquadai.json",
+        SUPPORTSQUADAI_GATEWAY_PORT: "19001",
       },
       sourcePath: "/tmp/bot.molt.gateway.plist",
     });

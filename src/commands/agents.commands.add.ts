@@ -9,6 +9,7 @@ import { ensureAuthProfileStore } from "../agents/auth-profiles.js";
 import { resolveAuthStorePath } from "../agents/auth-profiles/paths.js";
 import { writeConfigFile } from "../config/config.js";
 import { logConfigUpdated } from "../config/logging.js";
+import { resolveBrandDocsLink } from "../gateway/control-ui-brand.js";
 import { DEFAULT_AGENT_ID, normalizeAgentId } from "../routing/session-key.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { defaultRuntime } from "../runtime.js";
@@ -177,7 +178,7 @@ export async function agentsAddCommand(
 
   const prompter = createClackPrompter();
   try {
-    await prompter.intro("Add OpenClaw agent");
+    await prompter.intro("Add SupportSquadAI agent");
     const name =
       nameInput ??
       (await prompter.text({
@@ -333,7 +334,7 @@ export async function agentsAddCommand(
         await prompter.note(
           [
             "Routing unchanged. Add bindings when you're ready.",
-            "Docs: https://docs.openclaw.ai/concepts/multi-agent",
+            `Docs: ${resolveBrandDocsLink("/concepts/multi-agent")}`,
           ].join("\n"),
           "Routing",
         );

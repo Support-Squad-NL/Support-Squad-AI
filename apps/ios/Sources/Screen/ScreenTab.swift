@@ -1,4 +1,4 @@
-import OpenClawKit
+import SupportSquadAIKit
 import SwiftUI
 
 struct ScreenTab: View {

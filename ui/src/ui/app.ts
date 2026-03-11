@@ -52,6 +52,7 @@ import {
 } from "./app-tool-stream.ts";
 import type { AppViewState } from "./app-view-state.ts";
 import { normalizeAssistantIdentity } from "./assistant-identity.ts";
+import { buildControlUiDocumentTitle, DEFAULT_CONTROL_UI_BRAND } from "./brand.ts";
 import { loadAssistantIdentity as loadAssistantIdentityInternal } from "./controllers/assistant-identity.ts";
 import type { CronFieldErrors } from "./controllers/cron.ts";
 import type { DevicePairingList } from "./controllers/devices.ts";
@@ -88,7 +89,7 @@ import type { NostrProfileFormState } from "./views/channels.nostr-profile-form.
 
 declare global {
   interface Window {
-    __OPENCLAW_CONTROL_UI_BASE_PATH__?: string;
+    __SUPPORTSQUADAI_CONTROL_UI_BASE_PATH__?: string;
   }
 }
 
@@ -107,8 +108,8 @@ function resolveOnboardingMode(): boolean {
   return normalized === "1" || normalized === "true" || normalized === "yes" || normalized === "on";
 }
 
-@customElement("openclaw-app")
-export class OpenClawApp extends LitElement {
+@customElement("supportsquadai-app")
+export class SupportSquadAIApp extends LitElement {
   private i18nController = new I18nController(this);
   clientInstanceId = generateUUID();
   @state() settings: UiSettings = loadSettings();
@@ -132,6 +133,9 @@ export class OpenClawApp extends LitElement {
   private toolStreamSyncTimer: number | null = null;
   private sidebarCloseTimer: number | null = null;
 
+  @state() brandName = DEFAULT_CONTROL_UI_BRAND.name;
+  @state() brandSubtitle = DEFAULT_CONTROL_UI_BRAND.subtitle;
+  @state() docsUrl = DEFAULT_CONTROL_UI_BRAND.docsUrl;
   @state() assistantName = bootAssistantIdentity.name;
   @state() assistantAvatar = bootAssistantIdentity.avatar;
   @state() assistantAgentId = bootAssistantIdentity.agentId ?? null;
@@ -395,6 +399,7 @@ export class OpenClawApp extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
+    document.title = buildControlUiDocumentTitle(this.brandName);
     handleConnected(this as unknown as Parameters<typeof handleConnected>[0]);
   }
 
@@ -409,6 +414,9 @@ export class OpenClawApp extends LitElement {
 
   protected updated(changed: Map<PropertyKey, unknown>) {
     handleUpdated(this as unknown as Parameters<typeof handleUpdated>[0], changed);
+    if (changed.has("brandName")) {
+      document.title = buildControlUiDocumentTitle(this.brandName);
+    }
   }
 
   connect() {

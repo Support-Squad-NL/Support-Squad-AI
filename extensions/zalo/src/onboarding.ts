@@ -1,16 +1,16 @@
 import type {
   ChannelOnboardingAdapter,
   ChannelOnboardingDmPolicy,
-  OpenClawConfig,
+  SupportSquadAIConfig,
   WizardPrompter,
-} from "openclaw/plugin-sdk";
+} from "supportsquadai/plugin-sdk";
 import {
   addWildcardAllowFrom,
   DEFAULT_ACCOUNT_ID,
   mergeAllowFromEntries,
   normalizeAccountId,
   promptAccountId,
-} from "openclaw/plugin-sdk";
+} from "supportsquadai/plugin-sdk";
 import { listZaloAccountIds, resolveDefaultZaloAccountId, resolveZaloAccount } from "./accounts.js";
 
 const channel = "zalo" as const;
@@ -18,7 +18,7 @@ const channel = "zalo" as const;
 type UpdateMode = "polling" | "webhook";
 
 function setZaloDmPolicy(
-  cfg: OpenClawConfig,
+  cfg: SupportSquadAIConfig,
   dmPolicy: "pairing" | "allowlist" | "open" | "disabled",
 ) {
   const allowFrom =
@@ -33,17 +33,17 @@ function setZaloDmPolicy(
         ...(allowFrom ? { allowFrom } : {}),
       },
     },
-  } as OpenClawConfig;
+  } as SupportSquadAIConfig;
 }
 
 function setZaloUpdateMode(
-  cfg: OpenClawConfig,
+  cfg: SupportSquadAIConfig,
   accountId: string,
   mode: UpdateMode,
   webhookUrl?: string,
   webhookSecret?: string,
   webhookPath?: string,
-): OpenClawConfig {
+): SupportSquadAIConfig {
   const isDefault = accountId === DEFAULT_ACCOUNT_ID;
   if (mode === "polling") {
     if (isDefault) {
@@ -59,7 +59,7 @@ function setZaloUpdateMode(
           ...cfg.channels,
           zalo: rest,
         },
-      } as OpenClawConfig;
+      } as SupportSquadAIConfig;
     }
     const accounts = { ...cfg.channels?.zalo?.accounts } as Record<string, Record<string, unknown>>;
     const existing = accounts[accountId] ?? {};
@@ -74,7 +74,7 @@ function setZaloUpdateMode(
           accounts,
         },
       },
-    } as OpenClawConfig;
+    } as SupportSquadAIConfig;
   }
 
   if (isDefault) {
@@ -89,7 +89,7 @@ function setZaloUpdateMode(
           webhookPath,
         },
       },
-    } as OpenClawConfig;
+    } as SupportSquadAIConfig;
   }
 
   const accounts = { ...cfg.channels?.zalo?.accounts } as Record<string, Record<string, unknown>>;
@@ -108,7 +108,7 @@ function setZaloUpdateMode(
         accounts,
       },
     },
-  } as OpenClawConfig;
+  } as SupportSquadAIConfig;
 }
 
 async function noteZaloTokenHelp(prompter: WizardPrompter): Promise<void> {
@@ -118,17 +118,17 @@ async function noteZaloTokenHelp(prompter: WizardPrompter): Promise<void> {
       "2) Create a bot and get the token",
       "3) Token looks like 12345689:abc-xyz",
       "Tip: you can also set ZALO_BOT_TOKEN in your env.",
-      "Docs: https://docs.openclaw.ai/channels/zalo",
+      "Docs: https://docs.supportsquadai.ai/channels/zalo",
     ].join("\n"),
     "Zalo bot token",
   );
 }
 
 async function promptZaloAllowFrom(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   prompter: WizardPrompter;
   accountId: string;
-}): Promise<OpenClawConfig> {
+}): Promise<SupportSquadAIConfig> {
   const { cfg, prompter, accountId } = params;
   const resolved = resolveZaloAccount({ cfg, accountId });
   const existingAllowFrom = resolved.config.allowFrom ?? [];
@@ -162,7 +162,7 @@ async function promptZaloAllowFrom(params: {
           allowFrom: unique,
         },
       },
-    } as OpenClawConfig;
+    } as SupportSquadAIConfig;
   }
 
   return {
@@ -183,7 +183,7 @@ async function promptZaloAllowFrom(params: {
         },
       },
     },
-  } as OpenClawConfig;
+  } as SupportSquadAIConfig;
 }
 
 const dmPolicy: ChannelOnboardingDmPolicy = {
@@ -270,7 +270,7 @@ export const zaloOnboardingAdapter: ChannelOnboardingAdapter = {
               enabled: true,
             },
           },
-        } as OpenClawConfig;
+        } as SupportSquadAIConfig;
       } else {
         token = String(
           await prompter.text({
@@ -313,7 +313,7 @@ export const zaloOnboardingAdapter: ChannelOnboardingAdapter = {
               botToken: token,
             },
           },
-        } as OpenClawConfig;
+        } as SupportSquadAIConfig;
       } else {
         next = {
           ...next,
@@ -332,7 +332,7 @@ export const zaloOnboardingAdapter: ChannelOnboardingAdapter = {
               },
             },
           },
-        } as OpenClawConfig;
+        } as SupportSquadAIConfig;
       }
     }
 

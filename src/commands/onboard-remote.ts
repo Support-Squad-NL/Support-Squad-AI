@@ -1,4 +1,5 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
+import { resolveBrandDocsLink } from "../gateway/control-ui-brand.js";
 import { isSecureWebSocketUrl } from "../gateway/net.js";
 import type { GatewayBonjourBeacon } from "../infra/bonjour-discovery.js";
 import { discoverGatewayBeacons } from "../infra/bonjour-discovery.js";
@@ -42,9 +43,9 @@ function validateGatewayWebSocketUrl(value: string): string | undefined {
 }
 
 export async function promptRemoteGatewayConfig(
-  cfg: OpenClawConfig,
+  cfg: SupportSquadAIConfig,
   prompter: WizardPrompter,
-): Promise<OpenClawConfig> {
+): Promise<SupportSquadAIConfig> {
   let selectedBeacon: GatewayBonjourBeacon | null = null;
   let suggestedUrl = cfg.gateway?.remote?.url ?? DEFAULT_GATEWAY_URL;
 
@@ -60,7 +61,7 @@ export async function promptRemoteGatewayConfig(
     await prompter.note(
       [
         "Bonjour discovery requires dns-sd (macOS) or avahi-browse (Linux).",
-        "Docs: https://docs.openclaw.ai/gateway/discovery",
+        `Docs: ${resolveBrandDocsLink("/gateway/discovery")}`,
       ].join("\n"),
       "Discovery",
     );
@@ -124,7 +125,7 @@ export async function promptRemoteGatewayConfig(
             `ssh -N -L 18789:127.0.0.1:18789 <user>@${host}${
               selectedBeacon.sshPort ? ` -p ${selectedBeacon.sshPort}` : ""
             }`,
-            "Docs: https://docs.openclaw.ai/gateway/remote",
+            `Docs: ${resolveBrandDocsLink("/gateway/remote")}`,
           ].join("\n"),
           "SSH tunnel",
         );

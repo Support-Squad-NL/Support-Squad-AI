@@ -1,10 +1,10 @@
 {
-  "name": "@openclaw/open-prose",
+  "name": "@supportsquadai/open-prose",
   "version": "2026.2.23",
   "private": true,
   "description": "OpenProse VM skill pack plugin (slash command + telemetry).",
   "type": "module",
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ]

@@ -1,4 +1,5 @@
 import { readConfigFileSnapshot, resolveGatewayPort } from "../config/config.js";
+import { resolveBrandName } from "../gateway/control-ui-brand.js";
 import { copyToClipboard } from "../infra/clipboard.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { defaultRuntime } from "../runtime.js";
@@ -19,11 +20,12 @@ export async function dashboardCommand(
 ) {
   const snapshot = await readConfigFileSnapshot();
   const cfg = snapshot.valid ? snapshot.config : {};
+  const productName = resolveBrandName(cfg);
   const port = resolveGatewayPort(cfg);
   const bind = cfg.gateway?.bind ?? "loopback";
   const basePath = cfg.gateway?.controlUi?.basePath;
   const customBindHost = cfg.gateway?.customBindHost;
-  const token = cfg.gateway?.auth?.token ?? process.env.OPENCLAW_GATEWAY_TOKEN ?? "";
+  const token = cfg.gateway?.auth?.token ?? process.env.SUPPORTSQUADAI_GATEWAY_TOKEN ?? "";
 
   // LAN URLs fail secure-context checks in browsers.
   // Coerce only lan->loopback and preserve other bind modes.
@@ -62,7 +64,7 @@ export async function dashboardCommand(
   }
 
   if (opened) {
-    runtime.log("Opened in your browser. Keep that tab to control OpenClaw.");
+    runtime.log(`Opened in your browser. Keep that tab to control ${productName}.`);
   } else if (hint) {
     runtime.log(hint);
   }

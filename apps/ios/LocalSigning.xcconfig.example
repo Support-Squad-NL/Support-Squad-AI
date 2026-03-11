@@ -1,14 +1,14 @@
 // Copy to LocalSigning.xcconfig for personal local signing overrides.
 // This file is only an example and should stay committed.
 
-OPENCLAW_CODE_SIGN_STYLE = Automatic
-OPENCLAW_DEVELOPMENT_TEAM = P5Z8X89DJL
+SUPPORTSQUADAI_CODE_SIGN_STYLE = Automatic
+SUPPORTSQUADAI_DEVELOPMENT_TEAM = P5Z8X89DJL
 
-OPENCLAW_APP_BUNDLE_ID = ai.openclaw.ios.test.mariano
-OPENCLAW_SHARE_BUNDLE_ID = ai.openclaw.ios.test.mariano.share
-OPENCLAW_WATCH_APP_BUNDLE_ID = ai.openclaw.ios.test.mariano.watchkitapp
-OPENCLAW_WATCH_EXTENSION_BUNDLE_ID = ai.openclaw.ios.test.mariano.watchkitapp.extension
+SUPPORTSQUADAI_APP_BUNDLE_ID = ai.supportsquadai.ios.test.mariano
+SUPPORTSQUADAI_SHARE_BUNDLE_ID = ai.supportsquadai.ios.test.mariano.share
+SUPPORTSQUADAI_WATCH_APP_BUNDLE_ID = ai.supportsquadai.ios.test.mariano.watchkitapp
+SUPPORTSQUADAI_WATCH_EXTENSION_BUNDLE_ID = ai.supportsquadai.ios.test.mariano.watchkitapp.extension
 
 // Leave empty with automatic signing.
-OPENCLAW_APP_PROFILE =
-OPENCLAW_SHARE_PROFILE =
+SUPPORTSQUADAI_APP_PROFILE =
+SUPPORTSQUADAI_SHARE_PROFILE =

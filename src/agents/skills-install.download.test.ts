@@ -146,9 +146,9 @@ let stateDir = "";
 let restoreTempHome: (() => Promise<void>) | null = null;
 
 beforeAll(async () => {
-  const tempHome = await createTempHomeEnv("openclaw-skills-install-home-");
+  const tempHome = await createTempHomeEnv("supportsquadai-skills-install-home-");
   restoreTempHome = () => tempHome.restore();
-  workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "openclaw-skills-install-"));
+  workspaceDir = await fs.mkdtemp(path.join(os.tmpdir(), "supportsquadai-skills-install-"));
   stateDir = setTempStateDir(workspaceDir);
 });
 

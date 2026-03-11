@@ -1,16 +1,16 @@
 {
-  "name": "@openclaw/memory-core",
+  "name": "@supportsquadai/memory-core",
   "version": "2026.2.23",
   "private": true,
-  "description": "OpenClaw core memory search plugin",
+  "description": "SupportSquadAI core memory search plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
   "peerDependencies": {
-    "openclaw": ">=2026.1.26"
+    "supportsquadai": ">=2026.1.26"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ]

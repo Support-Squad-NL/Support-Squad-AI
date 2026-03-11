@@ -1,3 +1,4 @@
+import { resolveBrandSiteUrl } from "../gateway/control-ui-brand.js";
 import { requireActivePluginRegistry } from "../plugins/runtime.js";
 import type { ChannelMeta } from "./plugins/types.js";
 import type { ChannelId } from "./plugins/types.js";
@@ -21,7 +22,7 @@ export const CHANNEL_IDS = [...CHAT_CHANNEL_ORDER] as const;
 
 export type ChatChannelMeta = ChannelMeta;
 
-const WEBSITE_URL = "https://openclaw.ai";
+const WEBSITE_URL = resolveBrandSiteUrl();
 
 const CHAT_CHANNEL_META: Record<ChatChannelId, ChannelMeta> = {
   telegram: {

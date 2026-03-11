@@ -95,11 +95,11 @@ export function registerGatewayCli(program: Command) {
         "after",
         () =>
           `\n${theme.heading("Examples:")}\n${formatHelpExamples([
-            ["openclaw gateway run", "Run the gateway in the foreground."],
-            ["openclaw gateway status", "Show service status and probe reachability."],
-            ["openclaw gateway discover", "Find local and wide-area gateway beacons."],
-            ["openclaw gateway call health", "Call a gateway RPC method directly."],
-          ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/gateway", "docs.openclaw.ai/cli/gateway")}\n`,
+            ["supportsquadai gateway run", "Run the gateway in the foreground."],
+            ["supportsquadai gateway status", "Show service status and probe reachability."],
+            ["supportsquadai gateway discover", "Find local and wide-area gateway beacons."],
+            ["supportsquadai gateway call health", "Call a gateway RPC method directly."],
+          ])}\n\n${theme.muted("Docs:")} ${formatDocsLink("/cli/gateway", "docs.supportsquadai.ai/cli/gateway")}\n`,
       ),
   );
 

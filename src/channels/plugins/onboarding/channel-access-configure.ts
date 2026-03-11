@@ -1,19 +1,19 @@
-import type { OpenClawConfig } from "../../../config/config.js";
+import type { SupportSquadAIConfig } from "../../../config/config.js";
 import type { WizardPrompter } from "../../../wizard/prompts.js";
 import { promptChannelAccessConfig, type ChannelAccessPolicy } from "./channel-access.js";
 
 export async function configureChannelAccessWithAllowlist<TResolved>(params: {
-  cfg: OpenClawConfig;
+  cfg: SupportSquadAIConfig;
   prompter: WizardPrompter;
   label: string;
   currentPolicy: ChannelAccessPolicy;
   currentEntries: string[];
   placeholder: string;
   updatePrompt: boolean;
-  setPolicy: (cfg: OpenClawConfig, policy: ChannelAccessPolicy) => OpenClawConfig;
-  resolveAllowlist: (params: { cfg: OpenClawConfig; entries: string[] }) => Promise<TResolved>;
-  applyAllowlist: (params: { cfg: OpenClawConfig; resolved: TResolved }) => OpenClawConfig;
-}): Promise<OpenClawConfig> {
+  setPolicy: (cfg: SupportSquadAIConfig, policy: ChannelAccessPolicy) => SupportSquadAIConfig;
+  resolveAllowlist: (params: { cfg: SupportSquadAIConfig; entries: string[] }) => Promise<TResolved>;
+  applyAllowlist: (params: { cfg: SupportSquadAIConfig; resolved: TResolved }) => SupportSquadAIConfig;
+}): Promise<SupportSquadAIConfig> {
   let next = params.cfg;
   const accessConfig = await promptChannelAccessConfig({
     prompter: params.prompter,

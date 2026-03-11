@@ -2,6 +2,7 @@ import { formatCliCommand } from "../cli/command-format.js";
 import { withProgress } from "../cli/progress.js";
 import { resolveGatewayPort } from "../config/config.js";
 import { buildGatewayConnectionDetails, callGateway } from "../gateway/call.js";
+import { resolveBrandDocsLink } from "../gateway/control-ui-brand.js";
 import { info } from "../globals.js";
 import { formatTimeAgo } from "../infra/format-time/format-relative.ts";
 import type { HeartbeatEventPayload } from "../infra/heartbeat-events.js";
@@ -385,7 +386,7 @@ export async function statusCommand(
     },
   ];
 
-  runtime.log(theme.heading("OpenClaw status"));
+  runtime.log(theme.heading("SupportSquadAI status"));
   runtime.log("");
   runtime.log(theme.heading("Overview"));
   runtime.log(
@@ -442,8 +443,8 @@ export async function statusCommand(
       runtime.log(theme.muted(`… +${sorted.length - shown.length} more`));
     }
   }
-  runtime.log(theme.muted(`Full report: ${formatCliCommand("openclaw security audit")}`));
-  runtime.log(theme.muted(`Deep probe: ${formatCliCommand("openclaw security audit --deep")}`));
+  runtime.log(theme.muted(`Full report: ${formatCliCommand("supportsquadai security audit")}`));
+  runtime.log(theme.muted(`Deep probe: ${formatCliCommand("supportsquadai security audit --deep")}`));
 
   runtime.log("");
   runtime.log(theme.heading("Channels"));
@@ -607,8 +608,8 @@ export async function statusCommand(
   }
 
   runtime.log("");
-  runtime.log("FAQ: https://docs.openclaw.ai/faq");
-  runtime.log("Troubleshooting: https://docs.openclaw.ai/troubleshooting");
+  runtime.log(`FAQ: ${resolveBrandDocsLink("/faq")}`);
+  runtime.log(`Troubleshooting: ${resolveBrandDocsLink("/troubleshooting")}`);
   runtime.log("");
   const updateHint = formatUpdateAvailableHint(update);
   if (updateHint) {
@@ -616,11 +617,11 @@ export async function statusCommand(
     runtime.log("");
   }
   runtime.log("Next steps:");
-  runtime.log(`  Need to share?      ${formatCliCommand("openclaw status --all")}`);
-  runtime.log(`  Need to debug live? ${formatCliCommand("openclaw logs --follow")}`);
+  runtime.log(`  Need to share?      ${formatCliCommand("supportsquadai status --all")}`);
+  runtime.log(`  Need to debug live? ${formatCliCommand("supportsquadai logs --follow")}`);
   if (gatewayReachable) {
-    runtime.log(`  Need to test channels? ${formatCliCommand("openclaw status --deep")}`);
+    runtime.log(`  Need to test channels? ${formatCliCommand("supportsquadai status --deep")}`);
   } else {
-    runtime.log(`  Fix reachability first: ${formatCliCommand("openclaw gateway probe")}`);
+    runtime.log(`  Fix reachability first: ${formatCliCommand("supportsquadai gateway probe")}`);
   }
 }

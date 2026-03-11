@@ -27,8 +27,8 @@ afterEach(() => {
 
 describe("stageSandboxMedia", () => {
   it("stages inbound media into the sandbox workspace", async () => {
-    await withSandboxMediaTempHome("openclaw-triggers-", async (home) => {
-      const inboundDir = join(home, ".openclaw", "media", "inbound");
+    await withSandboxMediaTempHome("supportsquadai-triggers-", async (home) => {
+      const inboundDir = join(home, ".supportsquadai", "media", "inbound");
       await fs.mkdir(inboundDir, { recursive: true });
       const mediaPath = join(inboundDir, "photo.jpg");
       await fs.writeFile(mediaPath, "test");
@@ -46,7 +46,7 @@ describe("stageSandboxMedia", () => {
         sessionCtx,
         cfg: createSandboxMediaStageConfig(home),
         sessionKey: "agent:main:main",
-        workspaceDir: join(home, "openclaw"),
+        workspaceDir: join(home, "supportsquadai"),
       });
 
       const stagedPath = `media/inbound/${basename(mediaPath)}`;
@@ -61,8 +61,8 @@ describe("stageSandboxMedia", () => {
   });
 
   it("rejects staging host files from outside the media directory", async () => {
-    await withSandboxMediaTempHome("openclaw-triggers-bypass-", async (home) => {
-      // Sensitive host file outside .openclaw
+    await withSandboxMediaTempHome("supportsquadai-triggers-bypass-", async (home) => {
+      // Sensitive host file outside .supportsquadai
       const sensitiveFile = join(home, "secrets.txt");
       await fs.writeFile(sensitiveFile, "SENSITIVE DATA");
 
@@ -80,7 +80,7 @@ describe("stageSandboxMedia", () => {
         sessionCtx,
         cfg: createSandboxMediaStageConfig(home),
         sessionKey: "agent:main:main",
-        workspaceDir: join(home, "openclaw"),
+        workspaceDir: join(home, "supportsquadai"),
       });
 
       const stagedFullPath = join(sandboxDir, "media", "inbound", basename(sensitiveFile));
@@ -93,7 +93,7 @@ describe("stageSandboxMedia", () => {
   });
 
   it("blocks remote SCP staging for non-iMessage attachment paths", async () => {
-    await withSandboxMediaTempHome("openclaw-triggers-remote-block-", async (home) => {
+    await withSandboxMediaTempHome("supportsquadai-triggers-remote-block-", async (home) => {
       const sandboxDir = join(home, "sandboxes", "session");
       vi.mocked(ensureSandboxWorkspaceForSession).mockResolvedValue({
         workspaceDir: sandboxDir,
@@ -111,7 +111,7 @@ describe("stageSandboxMedia", () => {
         sessionCtx,
         cfg: createSandboxMediaStageConfig(home),
         sessionKey: "agent:main:main",
-        workspaceDir: join(home, "openclaw"),
+        workspaceDir: join(home, "supportsquadai"),
       });
 
       expect(childProcessMocks.spawn).not.toHaveBeenCalled();

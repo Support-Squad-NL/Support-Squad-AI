@@ -1,5 +1,5 @@
 import Testing
-@testable import OpenClaw
+@testable import SupportSquadAI
 
 @Suite(.serialized) struct GatewayDiscoveryModelTests {
     @Test @MainActor func debugLoggingCapturesLifecycleAndResets() {

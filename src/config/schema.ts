@@ -3,11 +3,11 @@ import { VERSION } from "../version.js";
 import type { ConfigUiHint, ConfigUiHints } from "./schema.hints.js";
 import { applySensitiveHints, buildBaseHints, mapSensitivePaths } from "./schema.hints.js";
 import { applyDerivedTags } from "./schema.tags.js";
-import { OpenClawSchema } from "./zod-schema.js";
+import { SupportSquadAISchema } from "./zod-schema.js";
 
 export type { ConfigUiHint, ConfigUiHints } from "./schema.hints.js";
 
-export type ConfigSchema = ReturnType<typeof OpenClawSchema.toJSONSchema>;
+export type ConfigSchema = ReturnType<typeof SupportSquadAISchema.toJSONSchema>;
 
 type JsonSchemaNode = Record<string, unknown>;
 
@@ -323,12 +323,12 @@ function buildBaseConfigSchema(): ConfigSchemaResponse {
   if (cachedBase) {
     return cachedBase;
   }
-  const schema = OpenClawSchema.toJSONSchema({
+  const schema = SupportSquadAISchema.toJSONSchema({
     target: "draft-07",
     unrepresentable: "any",
   });
-  schema.title = "OpenClawConfig";
-  const hints = applyDerivedTags(mapSensitivePaths(OpenClawSchema, "", buildBaseHints()));
+  schema.title = "SupportSquadAIConfig";
+  const hints = applyDerivedTags(mapSensitivePaths(SupportSquadAISchema, "", buildBaseHints()));
   const next = {
     schema: stripChannelSchema(schema),
     uiHints: hints,

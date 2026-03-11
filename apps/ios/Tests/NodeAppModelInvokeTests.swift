@@ -1,8 +1,8 @@
-import OpenClawKit
+import SupportSquadAIKit
 import Foundation
 import Testing
 import UIKit
-@testable import OpenClaw
+@testable import SupportSquadAI
 
 private func withUserDefaults<T>(_ updates: [String: Any?], _ body: () throws -> T) rethrows -> T {
     let defaults = UserDefaults.standard
@@ -42,7 +42,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
         queuedForDelivery: false,
         transport: "sendMessage")
     var sendError: Error?
-    var lastSent: (id: String, params: OpenClawWatchNotifyParams)?
+    var lastSent: (id: String, params: SupportSquadAIWatchNotifyParams)?
     private var replyHandler: (@Sendable (WatchQuickReplyEvent) -> Void)?
 
     func status() async -> WatchMessagingStatus {
@@ -53,7 +53,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
         self.replyHandler = handler
     }
 
-    func sendNotification(id: String, params: OpenClawWatchNotifyParams) async throws -> WatchNotificationSendResult {
+    func sendNotification(id: String, params: SupportSquadAIWatchNotifyParams) async throws -> WatchNotificationSendResult {
         self.lastSent = (id: id, params: params)
         if let sendError = self.sendError {
             throw sendError
@@ -69,7 +69,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
 @Suite(.serialized) struct NodeAppModelInvokeTests {
     @Test @MainActor func decodeParamsFailsWithoutJSON() {
         #expect(throws: Error.self) {
-            _ = try NodeAppModel._test_decodeParams(OpenClawCanvasNavigateParams.self, from: nil)
+            _ = try NodeAppModel._test_decodeParams(SupportSquadAICanvasNavigateParams.self, from: nil)
         }
     }
 
@@ -98,7 +98,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
         let appModel = NodeAppModel()
         appModel.setScenePhase(.background)
 
-        let req = BridgeInvokeRequest(id: "bg", command: OpenClawCanvasCommand.present.rawValue)
+        let req = BridgeInvokeRequest(id: "bg", command: SupportSquadAICanvasCommand.present.rawValue)
         let res = await appModel._test_handleInvoke(req)
         #expect(res.ok == false)
         #expect(res.error?.code == .backgroundUnavailable)
@@ -106,7 +106,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
 
     @Test @MainActor func handleInvokeRejectsCameraWhenDisabled() async {
         let appModel = NodeAppModel()
-        let req = BridgeInvokeRequest(id: "cam", command: OpenClawCameraCommand.snap.rawValue)
+        let req = BridgeInvokeRequest(id: "cam", command: SupportSquadAICameraCommand.snap.rawValue)
 
         let defaults = UserDefaults.standard
         let key = "camera.enabled"
@@ -128,13 +128,13 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
 
     @Test @MainActor func handleInvokeRejectsInvalidScreenFormat() async {
         let appModel = NodeAppModel()
-        let params = OpenClawScreenRecordParams(format: "gif")
+        let params = SupportSquadAIScreenRecordParams(format: "gif")
         let data = try? JSONEncoder().encode(params)
         let json = data.flatMap { String(data: $0, encoding: .utf8) }
 
         let req = BridgeInvokeRequest(
             id: "screen",
-            command: OpenClawScreenCommand.record.rawValue,
+            command: SupportSquadAIScreenCommand.record.rawValue,
             paramsJSON: json)
 
         let res = await appModel._test_handleInvoke(req)
@@ -146,29 +146,29 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
         let appModel = NodeAppModel()
         appModel.screen.navigate(to: "http://example.com")
 
-        let present = BridgeInvokeRequest(id: "present", command: OpenClawCanvasCommand.present.rawValue)
+        let present = BridgeInvokeRequest(id: "present", command: SupportSquadAICanvasCommand.present.rawValue)
         let presentRes = await appModel._test_handleInvoke(present)
         #expect(presentRes.ok == true)
         #expect(appModel.screen.urlString.isEmpty)
 
         // Loopback URLs are rejected (they are not meaningful for a remote gateway).
-        let navigateParams = OpenClawCanvasNavigateParams(url: "http://example.com/")
+        let navigateParams = SupportSquadAICanvasNavigateParams(url: "http://example.com/")
         let navData = try JSONEncoder().encode(navigateParams)
         let navJSON = String(decoding: navData, as: UTF8.self)
         let navigate = BridgeInvokeRequest(
             id: "nav",
-            command: OpenClawCanvasCommand.navigate.rawValue,
+            command: SupportSquadAICanvasCommand.navigate.rawValue,
             paramsJSON: navJSON)
         let navRes = await appModel._test_handleInvoke(navigate)
         #expect(navRes.ok == true)
         #expect(appModel.screen.urlString == "http://example.com/")
 
-        let evalParams = OpenClawCanvasEvalParams(javaScript: "1+1")
+        let evalParams = SupportSquadAICanvasEvalParams(javaScript: "1+1")
         let evalData = try JSONEncoder().encode(evalParams)
         let evalJSON = String(decoding: evalData, as: UTF8.self)
         let eval = BridgeInvokeRequest(
             id: "eval",
-            command: OpenClawCanvasCommand.evalJS.rawValue,
+            command: SupportSquadAICanvasCommand.evalJS.rawValue,
             paramsJSON: evalJSON)
         let evalRes = await appModel._test_handleInvoke(eval)
         #expect(evalRes.ok == true)
@@ -180,18 +180,18 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
     @Test @MainActor func handleInvokeA2UICommandsFailWhenHostMissing() async throws {
         let appModel = NodeAppModel()
 
-        let reset = BridgeInvokeRequest(id: "reset", command: OpenClawCanvasA2UICommand.reset.rawValue)
+        let reset = BridgeInvokeRequest(id: "reset", command: SupportSquadAICanvasA2UICommand.reset.rawValue)
         let resetRes = await appModel._test_handleInvoke(reset)
         #expect(resetRes.ok == false)
         #expect(resetRes.error?.message.contains("A2UI_HOST_NOT_CONFIGURED") == true)
 
         let jsonl = "{\"beginRendering\":{}}"
-        let pushParams = OpenClawCanvasA2UIPushJSONLParams(jsonl: jsonl)
+        let pushParams = SupportSquadAICanvasA2UIPushJSONLParams(jsonl: jsonl)
         let pushData = try JSONEncoder().encode(pushParams)
         let pushJSON = String(decoding: pushData, as: UTF8.self)
         let push = BridgeInvokeRequest(
             id: "push",
-            command: OpenClawCanvasA2UICommand.pushJSONL.rawValue,
+            command: SupportSquadAICanvasA2UICommand.pushJSONL.rawValue,
             paramsJSON: pushJSON)
         let pushRes = await appModel._test_handleInvoke(push)
         #expect(pushRes.ok == false)
@@ -215,13 +215,13 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
             reachable: false,
             activationState: "inactive")
         let appModel = NodeAppModel(watchMessagingService: watchService)
-        let req = BridgeInvokeRequest(id: "watch-status", command: OpenClawWatchCommand.status.rawValue)
+        let req = BridgeInvokeRequest(id: "watch-status", command: SupportSquadAIWatchCommand.status.rawValue)
 
         let res = await appModel._test_handleInvoke(req)
         #expect(res.ok == true)
 
         let payloadData = try #require(res.payloadJSON?.data(using: .utf8))
-        let payload = try JSONDecoder().decode(OpenClawWatchStatusPayload.self, from: payloadData)
+        let payload = try JSONDecoder().decode(SupportSquadAIWatchStatusPayload.self, from: payloadData)
         #expect(payload.supported == true)
         #expect(payload.reachable == false)
         #expect(payload.activationState == "inactive")
@@ -234,25 +234,25 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
             queuedForDelivery: true,
             transport: "transferUserInfo")
         let appModel = NodeAppModel(watchMessagingService: watchService)
-        let params = OpenClawWatchNotifyParams(
-            title: "OpenClaw",
+        let params = SupportSquadAIWatchNotifyParams(
+            title: "SupportSquadAI",
             body: "Meeting with Peter is at 4pm",
             priority: .timeSensitive)
         let paramsData = try JSONEncoder().encode(params)
         let paramsJSON = String(decoding: paramsData, as: UTF8.self)
         let req = BridgeInvokeRequest(
             id: "watch-notify",
-            command: OpenClawWatchCommand.notify.rawValue,
+            command: SupportSquadAIWatchCommand.notify.rawValue,
             paramsJSON: paramsJSON)
 
         let res = await appModel._test_handleInvoke(req)
         #expect(res.ok == true)
-        #expect(watchService.lastSent?.params.title == "OpenClaw")
+        #expect(watchService.lastSent?.params.title == "SupportSquadAI")
         #expect(watchService.lastSent?.params.body == "Meeting with Peter is at 4pm")
         #expect(watchService.lastSent?.params.priority == .timeSensitive)
 
         let payloadData = try #require(res.payloadJSON?.data(using: .utf8))
-        let payload = try JSONDecoder().decode(OpenClawWatchNotifyPayload.self, from: payloadData)
+        let payload = try JSONDecoder().decode(SupportSquadAIWatchNotifyPayload.self, from: payloadData)
         #expect(payload.deliveredImmediately == false)
         #expect(payload.queuedForDelivery == true)
         #expect(payload.transport == "transferUserInfo")
@@ -261,12 +261,12 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
     @Test @MainActor func handleInvokeWatchNotifyRejectsEmptyMessage() async throws {
         let watchService = MockWatchMessagingService()
         let appModel = NodeAppModel(watchMessagingService: watchService)
-        let params = OpenClawWatchNotifyParams(title: "   ", body: "\n")
+        let params = SupportSquadAIWatchNotifyParams(title: "   ", body: "\n")
         let paramsData = try JSONEncoder().encode(params)
         let paramsJSON = String(decoding: paramsData, as: UTF8.self)
         let req = BridgeInvokeRequest(
             id: "watch-notify-empty",
-            command: OpenClawWatchCommand.notify.rawValue,
+            command: SupportSquadAIWatchCommand.notify.rawValue,
             paramsJSON: paramsJSON)
 
         let res = await appModel._test_handleInvoke(req)
@@ -282,12 +282,12 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
             code: 1,
             userInfo: [NSLocalizedDescriptionKey: "WATCH_UNAVAILABLE: no paired Apple Watch"])
         let appModel = NodeAppModel(watchMessagingService: watchService)
-        let params = OpenClawWatchNotifyParams(title: "OpenClaw", body: "Delivery check")
+        let params = SupportSquadAIWatchNotifyParams(title: "SupportSquadAI", body: "Delivery check")
         let paramsData = try JSONEncoder().encode(params)
         let paramsJSON = String(decoding: paramsData, as: UTF8.self)
         let req = BridgeInvokeRequest(
             id: "watch-notify-fail",
-            command: OpenClawWatchCommand.notify.rawValue,
+            command: SupportSquadAIWatchCommand.notify.rawValue,
             paramsJSON: paramsJSON)
 
         let res = await appModel._test_handleInvoke(req)
@@ -314,7 +314,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
 
     @Test @MainActor func handleDeepLinkSetsErrorWhenNotConnected() async {
         let appModel = NodeAppModel()
-        let url = URL(string: "openclaw://agent?message=hello")!
+        let url = URL(string: "supportsquadai://agent?message=hello")!
         await appModel.handleDeepLink(url: url)
         #expect(appModel.screen.errorText?.contains("Gateway not connected") == true)
     }
@@ -322,7 +322,7 @@ private final class MockWatchMessagingService: WatchMessagingServicing, @uncheck
     @Test @MainActor func handleDeepLinkRejectsOversizedMessage() async {
         let appModel = NodeAppModel()
         let msg = String(repeating: "a", count: 20001)
-        let url = URL(string: "openclaw://agent?message=\(msg)")!
+        let url = URL(string: "supportsquadai://agent?message=\(msg)")!
         await appModel.handleDeepLink(url: url)
         #expect(appModel.screen.errorText?.contains("Deep link too large") == true)
     }

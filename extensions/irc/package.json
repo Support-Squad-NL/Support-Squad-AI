@@ -1,12 +1,12 @@
 {
-  "name": "@openclaw/irc",
+  "name": "@supportsquadai/irc",
   "version": "2026.2.23",
-  "description": "OpenClaw IRC channel plugin",
+  "description": "SupportSquadAI IRC channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ]

@@ -32,8 +32,8 @@ apps/android/.cxx/
 *.bun-build
 apps/macos/.build/
 apps/shared/MoltbotKit/.build/
-apps/shared/OpenClawKit/.build/
-apps/shared/OpenClawKit/Package.resolved
+apps/shared/SupportSquadAIKit/.build/
+apps/shared/SupportSquadAIKit/Package.resolved
 **/ModuleCache/
 bin/
 bin/clawdbot-mac
@@ -41,7 +41,7 @@ bin/docs-list
 apps/macos/.build-local/
 apps/macos/.swiftpm/
 apps/shared/MoltbotKit/.swiftpm/
-apps/shared/OpenClawKit/.swiftpm/
+apps/shared/SupportSquadAIKit/.swiftpm/
 Core/
 apps/ios/*.xcodeproj/
 apps/ios/*.xcworkspace/

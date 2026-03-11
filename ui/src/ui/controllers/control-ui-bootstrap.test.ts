@@ -9,7 +9,10 @@ describe("loadControlUiBootstrapConfig", () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        basePath: "/openclaw",
+        basePath: "/supportsquadai",
+        brandName: "Acme AI",
+        brandSubtitle: "Admin Console",
+        docsUrl: "https://docs.acme.test",
         assistantName: "Ops",
         assistantAvatar: "O",
         assistantAgentId: "main",
@@ -18,7 +21,10 @@ describe("loadControlUiBootstrapConfig", () => {
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
     const state = {
-      basePath: "/openclaw",
+      basePath: "/supportsquadai",
+      brandName: "SupportSquadAI",
+      brandSubtitle: "Gateway Dashboard",
+      docsUrl: "https://docs.supportsquadai.ai",
       assistantName: "Assistant",
       assistantAvatar: null,
       assistantAgentId: null,
@@ -27,9 +33,12 @@ describe("loadControlUiBootstrapConfig", () => {
     await loadControlUiBootstrapConfig(state);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `/openclaw${CONTROL_UI_BOOTSTRAP_CONFIG_PATH}`,
+      `/supportsquadai${CONTROL_UI_BOOTSTRAP_CONFIG_PATH}`,
       expect.objectContaining({ method: "GET" }),
     );
+    expect(state.brandName).toBe("Acme AI");
+    expect(state.brandSubtitle).toBe("Admin Console");
+    expect(state.docsUrl).toBe("https://docs.acme.test");
     expect(state.assistantName).toBe("Ops");
     expect(state.assistantAvatar).toBe("O");
     expect(state.assistantAgentId).toBe("main");
@@ -43,6 +52,9 @@ describe("loadControlUiBootstrapConfig", () => {
 
     const state = {
       basePath: "",
+      brandName: "SupportSquadAI",
+      brandSubtitle: "Gateway Dashboard",
+      docsUrl: "https://docs.supportsquadai.ai",
       assistantName: "Assistant",
       assistantAvatar: null,
       assistantAgentId: null,
@@ -64,7 +76,10 @@ describe("loadControlUiBootstrapConfig", () => {
     vi.stubGlobal("fetch", fetchMock as unknown as typeof fetch);
 
     const state = {
-      basePath: "/openclaw/",
+      basePath: "/supportsquadai/",
+      brandName: "SupportSquadAI",
+      brandSubtitle: "Gateway Dashboard",
+      docsUrl: "https://docs.supportsquadai.ai",
       assistantName: "Assistant",
       assistantAvatar: null,
       assistantAgentId: null,
@@ -73,7 +88,7 @@ describe("loadControlUiBootstrapConfig", () => {
     await loadControlUiBootstrapConfig(state);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `/openclaw${CONTROL_UI_BOOTSTRAP_CONFIG_PATH}`,
+      `/supportsquadai${CONTROL_UI_BOOTSTRAP_CONFIG_PATH}`,
       expect.objectContaining({ method: "GET" }),
     );
 

@@ -1,10 +1,10 @@
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 
 export function setPluginEnabledInConfig(
-  config: OpenClawConfig,
+  config: SupportSquadAIConfig,
   pluginId: string,
   enabled: boolean,
-): OpenClawConfig {
+): SupportSquadAIConfig {
   return {
     ...config,
     plugins: {

@@ -5,13 +5,14 @@ import type {
   OnboardOptions,
   ResetScope,
 } from "../commands/onboard-types.js";
-import type { OpenClawConfig } from "../config/config.js";
+import type { SupportSquadAIConfig } from "../config/config.js";
 import {
   DEFAULT_GATEWAY_PORT,
   readConfigFileSnapshot,
   resolveGatewayPort,
   writeConfigFile,
 } from "../config/config.js";
+import { resolveBrandDocsLink, resolveBrandName } from "../gateway/control-ui-brand.js";
 import type { RuntimeEnv } from "../runtime.js";
 import { defaultRuntime } from "../runtime.js";
 import { resolveUserPath } from "../utils.js";
@@ -26,15 +27,16 @@ async function requireRiskAcknowledgement(params: {
     return;
   }
 
+  const productName = resolveBrandName();
   await params.prompter.note(
     [
       "Security warning — please read.",
       "",
-      "OpenClaw is a hobby project and still in beta. Expect sharp edges.",
+      `${productName} is a hobby project and still in beta. Expect sharp edges.`,
       "This bot can read files and run actions if tools are enabled.",
       "A bad prompt can trick it into doing unsafe things.",
       "",
-      "If you’re not comfortable with basic security and access control, don’t run OpenClaw.",
+      `If you’re not comfortable with basic security and access control, don’t run ${productName}.`,
       "Ask someone experienced to help before enabling tools or exposing it to the internet.",
       "",
       "Recommended baseline:",
@@ -44,10 +46,10 @@ async function requireRiskAcknowledgement(params: {
       "- Use the strongest available model for any bot with tools or untrusted inboxes.",
       "",
       "Run regularly:",
-      "openclaw security audit --deep",
-      "openclaw security audit --fix",
+      "supportsquadai security audit --deep",
+      "supportsquadai security audit --fix",
       "",
-      "Must read: https://docs.openclaw.ai/gateway/security",
+      `Must read: ${resolveBrandDocsLink("/gateway/security")}`,
     ].join("\n"),
     "Security",
   );
@@ -67,12 +69,13 @@ export async function runOnboardingWizard(
   prompter: WizardPrompter,
 ) {
   const onboardHelpers = await import("../commands/onboard-helpers.js");
+  const productName = resolveBrandName();
   onboardHelpers.printWizardHeader(runtime);
-  await prompter.intro("OpenClaw onboarding");
+  await prompter.intro(`${productName} onboarding`);
   await requireRiskAcknowledgement({ opts, prompter });
 
   const snapshot = await readConfigFileSnapshot();
-  let baseConfig: OpenClawConfig = snapshot.valid ? snapshot.config : {};
+  let baseConfig: SupportSquadAIConfig = snapshot.valid ? snapshot.config : {};
 
   if (snapshot.exists && !snapshot.valid) {
     await prompter.note(onboardHelpers.summarizeExistingConfig(baseConfig), "Invalid config");
@@ -81,19 +84,19 @@ export async function runOnboardingWizard(
         [
           ...snapshot.issues.map((iss) => `- ${iss.path}: ${iss.message}`),
           "",
-          "Docs: https://docs.openclaw.ai/gateway/configuration",
+          `Docs: ${resolveBrandDocsLink("/gateway/configuration")}`,
         ].join("\n"),
         "Config issues",
       );
     }
     await prompter.outro(
-      `Config invalid. Run \`${formatCliCommand("openclaw doctor")}\` to repair it, then re-run onboarding.`,
+      `Config invalid. Run \`${formatCliCommand("supportsquadai doctor")}\` to repair it, then re-run onboarding.`,
     );
     runtime.exit(1);
     return;
   }
 
-  const quickstartHint = `Configure details later via ${formatCliCommand("openclaw configure")}.`;
+  const quickstartHint = `Configure details later via ${formatCliCommand("supportsquadai configure")}.`;
   const manualHint = "Configure port, network, Tailscale, and auth options.";
   const explicitFlowRaw = opts.flow?.trim();
   const normalizedExplicitFlow = explicitFlowRaw === "manual" ? "advanced" : explicitFlowRaw;
@@ -274,8 +277,8 @@ export async function runOnboardingWizard(
   const localUrl = `ws://127.0.0.1:${localPort}`;
   const localProbe = await onboardHelpers.probeGatewayReachable({
     url: localUrl,
-    token: baseConfig.gateway?.auth?.token ?? process.env.OPENCLAW_GATEWAY_TOKEN,
-    password: baseConfig.gateway?.auth?.password ?? process.env.OPENCLAW_GATEWAY_PASSWORD,
+    token: baseConfig.gateway?.auth?.token ?? process.env.SUPPORTSQUADAI_GATEWAY_TOKEN,
+    password: baseConfig.gateway?.auth?.password ?? process.env.SUPPORTSQUADAI_GATEWAY_PASSWORD,
   });
   const remoteUrl = baseConfig.gateway?.remote?.url?.trim() ?? "";
   const remoteProbe = remoteUrl
@@ -334,7 +337,7 @@ export async function runOnboardingWizard(
   const workspaceDir = resolveUserPath(workspaceInput.trim() || onboardHelpers.DEFAULT_WORKSPACE);
 
   const { applyOnboardingLocalWorkspaceConfig } = await import("../commands/onboard-config.js");
-  let nextConfig: OpenClawConfig = applyOnboardingLocalWorkspaceConfig(baseConfig, workspaceDir);
+  let nextConfig: SupportSquadAIConfig = applyOnboardingLocalWorkspaceConfig(baseConfig, workspaceDir);
 
   const { ensureAuthProfileStore } = await import("../agents/auth-profiles.js");
   const { promptAuthChoiceGrouped } = await import("../commands/auth-choice-prompt.js");

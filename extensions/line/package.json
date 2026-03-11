@@ -1,13 +1,13 @@
 {
-  "name": "@openclaw/line",
+  "name": "@supportsquadai/line",
   "version": "2026.2.23",
   "private": true,
-  "description": "OpenClaw LINE channel plugin",
+  "description": "SupportSquadAI LINE channel plugin",
   "type": "module",
   "devDependencies": {
-    "openclaw": "workspace:*"
+    "supportsquadai": "workspace:*"
   },
-  "openclaw": {
+  "supportsquadai": {
     "extensions": [
       "./index.ts"
     ],
@@ -22,7 +22,7 @@
       "quickstartAllowFrom": true
     },
     "install": {
-      "npmSpec": "@openclaw/line",
+      "npmSpec": "@supportsquadai/line",
       "localPath": "extensions/line",
       "defaultChoice": "npm"
     }

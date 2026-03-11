@@ -8,7 +8,7 @@ title: "acp"
 
 # acp
 
-Run the ACP (Agent Client Protocol) bridge that talks to a OpenClaw Gateway.
+Run the ACP (Agent Client Protocol) bridge that talks to a SupportSquadAI Gateway.
 
 This command speaks ACP over stdio for IDEs and forwards prompts to the Gateway
 over WebSocket. It keeps ACP sessions mapped to Gateway session keys.
@@ -16,22 +16,22 @@ over WebSocket. It keeps ACP sessions mapped to Gateway session keys.
 ## Usage
 
 ```bash
-openclaw acp
+supportsquadai acp
 
 # Remote Gateway
-openclaw acp --url wss://gateway-host:18789 --token <token>
+supportsquadai acp --url wss://gateway-host:18789 --token <token>
 
 # Remote Gateway (token from file)
-openclaw acp --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
+supportsquadai acp --url wss://gateway-host:18789 --token-file ~/.supportsquadai/gateway.token
 
 # Attach to an existing session key
-openclaw acp --session agent:main:main
+supportsquadai acp --session agent:main:main
 
 # Attach by label (must already exist)
-openclaw acp --session-label "support inbox"
+supportsquadai acp --session-label "support inbox"
 
 # Reset the session key before the first prompt
-openclaw acp --session agent:main:main --reset-session
+supportsquadai acp --session agent:main:main --reset-session
 ```
 
 ## ACP client (debug)
@@ -40,37 +40,37 @@ Use the built-in ACP client to sanity-check the bridge without an IDE.
 It spawns the ACP bridge and lets you type prompts interactively.
 
 ```bash
-openclaw acp client
+supportsquadai acp client
 
 # Point the spawned bridge at a remote Gateway
-openclaw acp client --server-args --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
+supportsquadai acp client --server-args --url wss://gateway-host:18789 --token-file ~/.supportsquadai/gateway.token
 
-# Override the server command (default: openclaw)
-openclaw acp client --server "node" --server-args openclaw.mjs acp --url ws://127.0.0.1:19001
+# Override the server command (default: supportsquadai)
+supportsquadai acp client --server "node" --server-args supportsquadai.mjs acp --url ws://127.0.0.1:19001
 ```
 
 ## How to use this
 
 Use ACP when an IDE (or other client) speaks Agent Client Protocol and you want
-it to drive a OpenClaw Gateway session.
+it to drive a SupportSquadAI Gateway session.
 
 1. Ensure the Gateway is running (local or remote).
 2. Configure the Gateway target (config or flags).
-3. Point your IDE to run `openclaw acp` over stdio.
+3. Point your IDE to run `supportsquadai acp` over stdio.
 
 Example config (persisted):
 
 ```bash
-openclaw config set gateway.remote.url wss://gateway-host:18789
-openclaw config set gateway.remote.token <token>
+supportsquadai config set gateway.remote.url wss://gateway-host:18789
+supportsquadai config set gateway.remote.token <token>
 ```
 
 Example direct run (no config write):
 
 ```bash
-openclaw acp --url wss://gateway-host:18789 --token <token>
+supportsquadai acp --url wss://gateway-host:18789 --token <token>
 # preferred for local process safety
-openclaw acp --url wss://gateway-host:18789 --token-file ~/.openclaw/gateway.token
+supportsquadai acp --url wss://gateway-host:18789 --token-file ~/.supportsquadai/gateway.token
 ```
 
 ## Selecting agents
@@ -80,9 +80,9 @@ ACP does not pick agents directly. It routes by the Gateway session key.
 Use agent-scoped session keys to target a specific agent:
 
 ```bash
-openclaw acp --session agent:main:main
-openclaw acp --session agent:design:main
-openclaw acp --session agent:qa:bug-123
+supportsquadai acp --session agent:main:main
+supportsquadai acp --session agent:design:main
+supportsquadai acp --session agent:qa:bug-123
 ```
 
 Each ACP session maps to a single Gateway session key. One agent can have many
@@ -96,9 +96,9 @@ Add a custom ACP agent in `~/.config/zed/settings.json` (or use Zed’s Settings
 ```json
 {
   "agent_servers": {
-    "OpenClaw ACP": {
+    "SupportSquadAI ACP": {
       "type": "custom",
-      "command": "openclaw",
+      "command": "supportsquadai",
       "args": ["acp"],
       "env": {}
     }
@@ -111,9 +111,9 @@ To target a specific Gateway or agent:
 ```json
 {
   "agent_servers": {
-    "OpenClaw ACP": {
+    "SupportSquadAI ACP": {
       "type": "custom",
-      "command": "openclaw",
+      "command": "supportsquadai",
       "args": [
         "acp",
         "--url",
@@ -129,7 +129,7 @@ To target a specific Gateway or agent:
 }
 ```
 
-In Zed, open the Agent panel and select “OpenClaw ACP” to start a thread.
+In Zed, open the Agent panel and select “SupportSquadAI ACP” to start a thread.
 
 ## Session mapping
 
@@ -171,12 +171,12 @@ Learn more about session keys at [/concepts/session](/concepts/session).
 Security note:
 
 - `--token` and `--password` can be visible in local process listings on some systems.
-- Prefer `--token-file`/`--password-file` or environment variables (`OPENCLAW_GATEWAY_TOKEN`, `OPENCLAW_GATEWAY_PASSWORD`).
+- Prefer `--token-file`/`--password-file` or environment variables (`SUPPORTSQUADAI_GATEWAY_TOKEN`, `SUPPORTSQUADAI_GATEWAY_PASSWORD`).
 
 ### `acp client` options
 
 - `--cwd <dir>`: working directory for the ACP session.
-- `--server <command>`: ACP server command (default: `openclaw`).
+- `--server <command>`: ACP server command (default: `supportsquadai`).
 - `--server-args <args...>`: extra arguments passed to the ACP server.
 - `--server-verbose`: enable verbose logging on the ACP server.
 - `--verbose, -v`: verbose client logging.

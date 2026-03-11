@@ -1,3 +1,5 @@
+import { resolveBrandDocsLink } from "./control-ui-brand.js";
+
 export const TAILSCALE_EXPOSURE_OPTIONS = [
   { value: "off", label: "Off", hint: "No Tailscale exposure" },
   {
@@ -22,6 +24,6 @@ export const TAILSCALE_MISSING_BIN_NOTE_LINES = [
 
 export const TAILSCALE_DOCS_LINES = [
   "Docs:",
-  "https://docs.openclaw.ai/gateway/tailscale",
-  "https://docs.openclaw.ai/web",
+  resolveBrandDocsLink("/gateway/tailscale"),
+  resolveBrandDocsLink("/web"),
 ] as const;
