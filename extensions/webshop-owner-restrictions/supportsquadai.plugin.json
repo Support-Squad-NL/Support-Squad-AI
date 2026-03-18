@@ -1,0 +1,23 @@
+{
+  "id": "webshop-owner-restrictions",
+  "name": "Webshop Owner Restrictions",
+  "description": "Injects a high-level owner-only system prompt based on sessionKey (e.g. owner:...).",
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "enabled": {
+        "type": "boolean"
+      },
+      "ownerSessionKeyPrefixes": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "systemPrompt": {
+        "type": "string"
+      }
+    }
+  }
+}

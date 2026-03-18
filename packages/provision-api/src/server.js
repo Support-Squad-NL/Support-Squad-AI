@@ -3,10 +3,13 @@ import express from "express";
 import { z } from "zod";
 import { buildCloudInitScript } from "./cloud-init.js";
 import { ContaboClient } from "./contabo.js";
+import { GoogleApiKeysClient } from "./google-api-keys.js";
+import { checkRemoteBootstrap } from "./remote-bootstrap-check.js";
 import { SqliteJobStore } from "./storage-sqlite.js";
 
 const WORKER_POLL_MS = Number(process.env.WORKER_POLL_MS ?? 3000);
 const INSTANCE_POLL_SECONDS = Number(process.env.INSTANCE_POLL_SECONDS ?? 20);
+const REUSE_INSTANCE_ID = parseOptionalInt(process.env.CONTABO_REUSE_INSTANCE_ID);
 
 const createAssistantSchema = z.object({
   idempotencyKey: z.string().min(8).max(128),
@@ -21,6 +24,8 @@ const createAssistantSchema = z.object({
   imageId: z.string().min(16).default("afecbb85-e2fc-46f0-9684-b46b1faf00bb"),
   defaultUser: z.enum(["root", "admin", "administrator"]).default("root"),
   rootPassword: safeSingleLineString().optional(),
+  geminiApiKey: safeSingleLineString().optional(),
+  autoCreateGeminiKey: z.boolean().default(true),
   gatewayToken: safeSingleLineString().optional(),
   gatewayMode: z.enum(["local", "remote"]).default("local"),
   gatewayBind: z.enum(["lan", "loopback"]).default("lan"),
@@ -241,47 +246,100 @@ async function processProvisionJob(job) {
   if (step === "create_instance") {
     const gatewayToken = job.payload.gatewayToken ?? randomBytes(32).toString("hex");
     const rootPassword = job.payload.rootPassword ?? generateRootPassword();
-    const rootSecretName = `supportsquadai-root-${job.id.slice(0, 8)}`;
-    const cloudInit = buildCloudInitScript({
-      ...job.payload.request,
-      tenant_id: assistant.tenantId,
-      account_id: assistant.accountId,
-      user_id: assistant.userId,
-      support_hub_api_key: assistant.supportHubApiKey,
-      gatewayToken,
-    });
     try {
-      const secret = await client.createSecret({
-        name: rootSecretName,
-        value: rootPassword,
-        type: "password",
-      });
-      if (!secret?.secretId) {
-        throw new Error("Contabo secret creation returned no secretId.");
+      const autoCreateGeminiKey = job.payload.autoCreateGeminiKey ?? true;
+      let geminiApiKey = job.payload.geminiApiKey ?? null;
+      let geminiApiKeyName = job.payload.geminiApiKeyName ?? null;
+      if (autoCreateGeminiKey && !geminiApiKey) {
+        appendEvent(job.id, "info", "Creating Gemini API key via Google API Keys", {});
+        const keyClient = GoogleApiKeysClient.fromEnv();
+        const created = await keyClient.createGeminiApiKey({
+          displayName: `supportsquadai-${assistant.assistantId}-${job.id.slice(0, 8)}`,
+        });
+        geminiApiKey = created.keyString;
+        geminiApiKeyName = created.name;
+        appendEvent(job.id, "info", "Gemini API key created", {
+          keyName: geminiApiKeyName,
+        });
       }
-      const instance = await client.createInstance({
-        productId: job.payload.request.productId,
-        region: job.payload.request.region,
-        period: job.payload.request.period,
-        displayName: job.payload.request.displayName,
-        defaultUser: job.payload.request.defaultUser,
-        rootPassword: Number(secret.secretId),
-        imageId: job.payload.request.imageId,
-        userData: cloudInit,
+      // Persist key details on the in-flight job so retries reuse it and avoid orphan key leaks.
+      job.payload = {
+        ...job.payload,
+        geminiApiKey,
+        geminiApiKeyName,
+      };
+
+      const modelEnv = { ...job.payload.request.modelEnv };
+      if (geminiApiKey) {
+        modelEnv.GEMINI_API_KEY = modelEnv.GEMINI_API_KEY ?? geminiApiKey;
+        modelEnv.GOOGLE_API_KEY = modelEnv.GOOGLE_API_KEY ?? geminiApiKey;
+      }
+
+      const rootSecretName = `supportsquadai-root-${job.id}-a${job.attempts ?? 0}`;
+      const cloudInit = buildCloudInitScript({
+        ...job.payload.request,
+        modelEnv,
+        tenant_id: assistant.tenantId,
+        account_id: assistant.accountId,
+        user_id: assistant.userId,
+        support_hub_api_key: assistant.supportHubApiKey,
+        gatewayToken,
       });
+
+      let secretId = Number(job.payload?.contabo?.secretId ?? 0);
+      if (!secretId) {
+        const secret = await client.createSecret({
+          name: rootSecretName,
+          value: rootPassword,
+          type: "password",
+        });
+        if (!secret?.secretId) {
+          throw new Error("Contabo secret creation returned no secretId.");
+        }
+        secretId = Number(secret.secretId);
+      }
+      const instance = REUSE_INSTANCE_ID
+        ? await client.reinstallInstance(REUSE_INSTANCE_ID, {
+            defaultUser: job.payload.request.defaultUser,
+            rootPassword: secretId,
+            imageId: job.payload.request.imageId,
+            userData: cloudInit,
+          })
+        : await client.createInstance({
+            productId: job.payload.request.productId,
+            region: job.payload.request.region,
+            period: job.payload.request.period,
+            displayName: job.payload.request.displayName,
+            defaultUser: job.payload.request.defaultUser,
+            rootPassword: secretId,
+            imageId: job.payload.request.imageId,
+            userData: cloudInit,
+          });
       if (!instance?.instanceId) {
-        throw new Error("Contabo instance creation returned no instanceId.");
+        throw new Error(
+          REUSE_INSTANCE_ID
+            ? "Contabo instance reinstall returned no instanceId."
+            : "Contabo instance creation returned no instanceId.",
+        );
       }
       const updatedAssistant = {
         ...assistant,
         status: "bootstrapping",
         updatedAt: nowIso(),
+        // Stored so we can generate a working dashboard URL for Control UI
+        // in insecure (HTTP) contexts where device identity is blocked.
+        gatewayToken,
         instance: {
           id: Number(instance.instanceId),
           ip: instance?.ipConfig?.v4?.ip ?? null,
           status: instance.status ?? null,
-          secretId: Number(secret.secretId),
+          secretId,
         },
+        gemini: geminiApiKeyName
+          ? {
+              apiKeyName: geminiApiKeyName,
+            }
+          : (assistant.gemini ?? null),
         webhook: {
           ...assistant.webhook,
           endpoint: buildWebhookEndpoint(
@@ -299,22 +357,31 @@ async function processProvisionJob(job) {
         updatedAt: nowIso(),
         payload: {
           ...job.payload,
+          geminiApiKey,
+          geminiApiKeyName,
           gatewayToken,
           step: "poll_instance",
           contabo: {
             instanceId: Number(instance.instanceId),
-            secretId: Number(secret.secretId),
+            secretId,
           },
         },
       };
       store.saveJob(queued);
-      appendEvent(job.id, "info", "Instance created, switching to poll step", {
-        instanceId: Number(instance.instanceId),
-        initialStatus: instance.status ?? null,
-      });
+      appendEvent(
+        job.id,
+        "info",
+        REUSE_INSTANCE_ID
+          ? "Instance reinstalled, switching to poll step"
+          : "Instance created, switching to poll step",
+        {
+          instanceId: Number(instance.instanceId),
+          initialStatus: instance.status ?? null,
+        },
+      );
       return;
     } catch (error) {
-      return retryOrFail(job, assistant, error, step);
+      return await retryOrFail(job, assistant, error, step);
     }
   }
 
@@ -330,6 +397,8 @@ async function processProvisionJob(job) {
       const assistantUpdate = {
         ...assistant,
         updatedAt: nowIso(),
+        // Keep token available for dashboardUrl generation across retries/polls.
+        gatewayToken: job.payload?.gatewayToken ?? assistant.gatewayToken,
         instance: {
           ...assistant.instance,
           id: instanceId,
@@ -347,6 +416,27 @@ async function processProvisionJob(job) {
       };
 
       if (status === "running") {
+        const readiness = await checkRemoteBootstrap({
+          host: ip,
+          rootPassword: job.payload?.rootPassword,
+          gatewayPort: job.payload?.request?.gatewayPort,
+        });
+        if (!readiness.ready) {
+          assistantUpdate.status = "bootstrapping";
+          store.upsertAssistant(assistantUpdate);
+          const queued = {
+            ...job,
+            state: "queued",
+            runAfter: addSeconds(INSTANCE_POLL_SECONDS),
+            updatedAt: nowIso(),
+          };
+          store.saveJob(queued);
+          appendEvent(job.id, "info", "Instance running, waiting for bootstrap readiness", {
+            checks: readiness.checks,
+          });
+          return;
+        }
+
         assistantUpdate.status = "ready";
         store.upsertAssistant(assistantUpdate);
         const completed = {
@@ -357,6 +447,7 @@ async function processProvisionJob(job) {
             instanceId,
             instanceIp: ip,
             webhookEndpoint: assistantUpdate.webhook.endpoint,
+            dashboardUrl: buildDashboardUrl(ip, assistantUpdate.gatewayToken),
           },
           error: null,
         };
@@ -395,7 +486,7 @@ async function processProvisionJob(job) {
       appendEvent(job.id, "warn", "Unexpected status during poll, retrying", { status });
       return;
     } catch (error) {
-      return retryOrFail(job, assistant, error, step);
+      return await retryOrFail(job, assistant, error, step);
     }
   }
 
@@ -421,9 +512,27 @@ async function processDeprovisionJob(job) {
     return;
   }
   try {
+    if (REUSE_INSTANCE_ID && instanceId === REUSE_INSTANCE_ID) {
+      const done = {
+        ...job,
+        state: "completed",
+        updatedAt: nowIso(),
+        result: {
+          skipped: true,
+          reason: "reuse-instance mode enabled; keep reusable test VPS",
+          instanceId,
+        },
+        error: null,
+      };
+      store.saveJob(done);
+      appendEvent(job.id, "info", "Deprovision skipped for reusable instance", { instanceId });
+      return;
+    }
+
     const client = ContaboClient.fromEnv();
     const cancelDate = new Date().toISOString().slice(0, 10);
     await client.cancelInstance(instanceId, cancelDate);
+    await maybeDeleteGeminiApiKey(assistant, job.id);
     const updatedAssistant = {
       ...assistant,
       status: "deprovision_requested",
@@ -440,12 +549,25 @@ async function processDeprovisionJob(job) {
     store.saveJob(done);
     appendEvent(job.id, "warn", "Deprovision requested at provider", { instanceId, cancelDate });
   } catch (error) {
-    return retryOrFail(job, assistant, error, "deprovision");
+    if (isAlreadyCanceledProviderError(error)) {
+      await maybeDeleteGeminiApiKey(assistant, job.id);
+      const done = {
+        ...job,
+        state: "completed",
+        updatedAt: nowIso(),
+        result: { instanceId, alreadyCanceled: true },
+        error: null,
+      };
+      store.saveJob(done);
+      appendEvent(job.id, "info", "Instance was already canceled at provider", { instanceId });
+      return;
+    }
+    return await retryOrFail(job, assistant, error, "deprovision");
   }
 }
 
-function retryOrFail(job, assistant, error, step) {
-  const maxAttempts = step === "poll_instance" ? 120 : 5;
+async function retryOrFail(job, assistant, error, step) {
+  const maxAttempts = step === "poll_instance" ? 120 : step === "deprovision" ? 20 : 5;
   if ((job.attempts ?? 0) < maxAttempts) {
     const queued = {
       ...job,
@@ -462,6 +584,9 @@ function retryOrFail(job, assistant, error, step) {
     });
     return;
   }
+  if (step === "create_instance" && !job.payload?.contabo?.instanceId) {
+    await maybeDeleteGeminiApiKeyByName(job.payload?.geminiApiKeyName, job.id);
+  }
   if (assistant) {
     const failedAssistant = {
       ...assistant,
@@ -471,6 +596,29 @@ function retryOrFail(job, assistant, error, step) {
     store.upsertAssistant(failedAssistant);
   }
   return failJob(job, error instanceof Error ? error.message : String(error));
+}
+
+async function maybeDeleteGeminiApiKey(assistant, jobId) {
+  const keyName = assistant?.gemini?.apiKeyName;
+  await maybeDeleteGeminiApiKeyByName(keyName, jobId);
+}
+
+async function maybeDeleteGeminiApiKeyByName(keyName, jobId) {
+  if (!keyName) {
+    return;
+  }
+  try {
+    const client = GoogleApiKeysClient.fromEnv();
+    await client.deleteApiKey(keyName);
+    appendEvent(jobId, "info", "Gemini API key deleted", { keyName });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("failed (404)")) {
+      appendEvent(jobId, "info", "Gemini API key already absent", { keyName });
+      return;
+    }
+    appendEvent(jobId, "warn", "Gemini API key delete failed", { keyName, error: message });
+  }
 }
 
 function failJob(job, message) {
@@ -483,6 +631,13 @@ function failJob(job, message) {
   store.saveJob(failed);
   appendEvent(job.id, "error", "Job failed", { error: message });
   return;
+}
+
+function isAlreadyCanceledProviderError(error) {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+  return error.message.includes("Cannot cancel instance as it has already been canceled");
 }
 
 function upsertAssistantFromInput(input) {
@@ -539,6 +694,9 @@ function createProvisionJob(assistant, input) {
       },
       gatewayToken: input.gatewayToken ?? randomBytes(32).toString("hex"),
       rootPassword: input.rootPassword ?? generateRootPassword(),
+      geminiApiKey: input.geminiApiKey ?? null,
+      geminiApiKeyName: null,
+      autoCreateGeminiKey: input.autoCreateGeminiKey,
     },
     result: null,
     error: null,
@@ -551,6 +709,7 @@ function sanitizeAssistant(assistant) {
     readiness: computeWebhookReadiness(assistant),
   };
   const statusSummary = computeStatusSummary(assistant, webhook.readiness);
+  const dashboardUrl = buildDashboardUrl(assistant?.instance?.ip, assistant?.gatewayToken);
   return {
     assistantId: assistant.assistantId,
     tenantId: assistant.tenantId,
@@ -560,6 +719,16 @@ function sanitizeAssistant(assistant) {
     statusSummary,
     webhook,
     readyForChatwoot: webhook.readiness === "ready",
+    dashboardUrl,
+    // For your webshop widget (custom client): auth via the gateway's shared token
+    // and use the same sessionKey prefix that the policy plugin matches (`owner:`).
+    widget: assistant?.gatewayToken
+      ? {
+          token: assistant.gatewayToken,
+          websocketUrl: buildGatewayWsUrl(assistant?.instance?.ip),
+          sessionKey: "owner:main",
+        }
+      : null,
     instance: assistant.instance ?? null,
     createdAt: assistant.createdAt,
     updatedAt: assistant.updatedAt,
@@ -641,6 +810,44 @@ function buildWebhookEndpoint(path, gatewayPort, instanceIp) {
   return `http://${instanceIp}:${gatewayPort ?? 18789}${cleanPath}`;
 }
 
+function buildDashboardUrl(instanceIp, gatewayToken) {
+  const explicitBase = process.env.DASHBOARD_PUBLIC_BASE_URL?.trim();
+  if (explicitBase) {
+    const base = explicitBase.replace(/\/$/, "");
+    if (!gatewayToken) {
+      return base;
+    }
+    const url = new URL(base);
+    url.searchParams.set("token", gatewayToken);
+    return url.toString();
+  }
+  if (!instanceIp) {
+    return null;
+  }
+  const url = new URL(`http://${instanceIp}`);
+  if (gatewayToken) {
+    url.searchParams.set("token", gatewayToken);
+  }
+  return url.toString();
+}
+
+function buildGatewayWsUrl(instanceIp) {
+  const explicitBase = process.env.DASHBOARD_PUBLIC_BASE_URL?.trim();
+  if (explicitBase) {
+    const url = new URL(explicitBase.replace(/\/$/, ""));
+    // Strip token query params for the widget; token is returned separately in `widget.token`.
+    url.search = "";
+    url.hash = "";
+    url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
+    return url.toString();
+  }
+  if (!instanceIp) {
+    return null;
+  }
+  // Nginx on this trial VPS forwards websocket traffic on port 80.
+  return `ws://${instanceIp}`;
+}
+
 function nowIso() {
   return new Date().toISOString();
 }
@@ -655,6 +862,17 @@ function isSqliteUniqueConstraintError(error) {
     "code" in error &&
     (error.code === "SQLITE_CONSTRAINT_UNIQUE" || error.code === "SQLITE_CONSTRAINT_PRIMARYKEY")
   );
+}
+
+function parseOptionalInt(value) {
+  if (!value) {
+    return null;
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return null;
+  }
+  return Math.trunc(parsed);
 }
 
 function computeWebhookReadiness(assistant) {
