@@ -1,0 +1,15 @@
+{
+  "name": "@supportsquadai/provision-api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Provision Contabo VPS instances and bootstrap SupportSquadAI.",
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "zod": "^4.3.6"
+  }
+}
