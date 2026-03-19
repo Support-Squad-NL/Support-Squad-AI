@@ -46,6 +46,29 @@ app.use(express.json({ limit: "1mb" }));
 const store = new SqliteJobStore();
 let workerRunning = false;
 
+app.get("/instance", (req, res) => {
+  const pickQueryString = (value) => (Array.isArray(value) ? value[0] : value);
+  const supportHubAccountId =
+    pickQueryString(req.query.support_hub_account_id) ??
+    pickQueryString(req.query.account_id) ??
+    pickQueryString(req.query.accountId);
+
+  const rawAccountId = typeof supportHubAccountId === "string" ? supportHubAccountId.trim() : "";
+  if (!rawAccountId) {
+    return res.status(400).json({ error: "Missing support_hub_account_id" });
+  }
+
+  const assistant = store.getLatestAssistantByAccountId(rawAccountId);
+  if (!assistant) {
+    return res.status(404).json({ error: "No instance data found for account_id" });
+  }
+
+  // For widget connect flow: return exactly what the frontend needs.
+  return res.status(200).json({
+    assistant: sanitizeAssistant(assistant),
+  });
+});
+
 app.get("/health", (_req, res) => {
   res.json({
     ok: true,
@@ -147,6 +170,12 @@ function deprovisionAssistantHandler(req, res) {
   const updatedAssistant = {
     ...assistant,
     status: "deprovision_requested",
+    gatewayToken: null,
+    instance: null,
+    webhook: {
+      ...assistant.webhook,
+      endpoint: null,
+    },
     lastJobId: job.id,
     updatedAt: nowIso(),
   };
@@ -513,6 +542,19 @@ async function processDeprovisionJob(job) {
   }
   try {
     if (REUSE_INSTANCE_ID && instanceId === REUSE_INSTANCE_ID) {
+      // Even when skipping provider cancel in reuse mode, wipe widget-connect data
+      // so `GET /instance` returns no usable connection parameters.
+      store.upsertAssistant({
+        ...assistant,
+        status: "deprovision_requested",
+        updatedAt: nowIso(),
+        gatewayToken: null,
+        instance: null,
+        webhook: {
+          ...assistant.webhook,
+          endpoint: null,
+        },
+      });
       const done = {
         ...job,
         state: "completed",
@@ -537,6 +579,12 @@ async function processDeprovisionJob(job) {
       ...assistant,
       status: "deprovision_requested",
       updatedAt: nowIso(),
+      gatewayToken: null,
+      instance: null,
+      webhook: {
+        ...assistant.webhook,
+        endpoint: null,
+      },
     };
     store.upsertAssistant(updatedAssistant);
     const done = {
@@ -551,6 +599,17 @@ async function processDeprovisionJob(job) {
   } catch (error) {
     if (isAlreadyCanceledProviderError(error)) {
       await maybeDeleteGeminiApiKey(assistant, job.id);
+      store.upsertAssistant({
+        ...assistant,
+        status: "deprovision_requested",
+        updatedAt: nowIso(),
+        gatewayToken: null,
+        instance: null,
+        webhook: {
+          ...assistant.webhook,
+          endpoint: null,
+        },
+      });
       const done = {
         ...job,
         state: "completed",
@@ -649,12 +708,16 @@ function upsertAssistantFromInput(input) {
     accountId: input.account_id,
     userId: input.user_id,
     supportHubApiKey: input.support_hub_api_key,
+    // Wipe old connect credentials on every new provision request.
+    gatewayToken: null,
     status: existing?.status ?? "requested",
     webhook: {
       path: "/hooks/agent",
-      endpoint: existing?.webhook?.endpoint ?? null,
+      // Wipe old instance/webhook endpoint data on every new provision request.
+      endpoint: null,
     },
-    instance: existing?.instance ?? null,
+    // Wipe old instance data on every new provision request.
+    instance: null,
     createdAt: existing?.createdAt ?? nowIso(),
     updatedAt: nowIso(),
     lastJobId: existing?.lastJobId ?? null,

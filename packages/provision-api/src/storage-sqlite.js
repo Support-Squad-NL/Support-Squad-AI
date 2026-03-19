@@ -28,6 +28,9 @@ export class SqliteJobStore {
     this.getAssistantStmt = this.db.prepare(
       "SELECT assistant_json FROM assistants WHERE assistant_id = ?",
     );
+    this.getLatestAssistantByAccountIdStmt = this.db.prepare(
+      "SELECT assistant_json FROM assistants WHERE account_id = ? ORDER BY updated_at DESC LIMIT 1",
+    );
 
     this.insertJobStmt = this.db.prepare(
       `INSERT INTO provision_jobs (
@@ -60,6 +63,11 @@ export class SqliteJobStore {
 
   getAssistant(assistantId) {
     const row = this.getAssistantStmt.get(assistantId);
+    return row ? JSON.parse(row.assistant_json) : null;
+  }
+
+  getLatestAssistantByAccountId(accountId) {
+    const row = this.getLatestAssistantByAccountIdStmt.get(accountId);
     return row ? JSON.parse(row.assistant_json) : null;
   }
 
