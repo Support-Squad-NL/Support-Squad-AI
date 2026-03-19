@@ -66,9 +66,11 @@ export function buildCloudInitScript(input) {
       enabled: true,
       entries: {
         "webshop-owner-restrictions": {
-          enabled: true,
+          // Default to standard assistant behavior for owner sessions.
+          // Restriction profile can be re-enabled later when needed.
+          enabled: false,
           config: {
-            enabled: true,
+            enabled: false,
             ownerSessionKeyPrefixes: ["owner:"],
           },
         },
