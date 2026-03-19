@@ -249,8 +249,22 @@ export function handleChatEvent(state: ChatState, payload?: ChatEventPayload) {
     }
   } else if (payload.state === "final") {
     const finalMessage = normalizeFinalAssistantMessage(payload.message);
+    const isOwnRun = Boolean(payload.runId && state.chatRunId && payload.runId === state.chatRunId);
     if (finalMessage) {
       state.chatMessages = [...state.chatMessages, finalMessage];
+    } else if (isOwnRun) {
+      // Gateway may send `final` without a `message` object (e.g. silent/NO_REPLY).
+      // Without this, the UI can end up blank for the user.
+      state.chatMessages = [
+        ...state.chatMessages,
+        {
+          role: "assistant",
+          content: [
+            { type: "text", text: "Geen antwoord ontvangen (no output). Probeer opnieuw." },
+          ],
+          timestamp: Date.now(),
+        },
+      ];
     }
     state.chatStream = null;
     state.chatRunId = null;

@@ -402,6 +402,18 @@ Details: [Security guide](https://docs.supportsquadai.ai/gateway/security) · [D
 
 - Uses the Gateway WebSocket; no separate WebChat port/config.
 
+#### Chat widget connection (custom UI)
+
+- Use the provision response `assistant.widget` bundle as source of truth:
+  - `websocketUrl`
+  - `token`
+  - `sessionKey` (typically `owner:main`)
+  - `assistantId`
+- Always connect over `wss://` when your frontend runs on HTTPS.
+- Follow the gateway RPC handshake (`connect.challenge` -> `connect` -> `chat.send`) instead of ad-hoc `type: "auth"` frames.
+- Use a unique `idempotencyKey` per `chat.send` request.
+- For attachment uploads from a custom widget, `chat.send.attachments` currently supports inline base64 images (`image/*`).
+
 Browser control (optional):
 
 ```json5

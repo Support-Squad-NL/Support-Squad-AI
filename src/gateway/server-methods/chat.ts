@@ -933,6 +933,7 @@ export const chatHandlers: GatewayRequestHandlers = {
               message,
             });
           }
+
           context.dedupe.set(`chat:${clientRunId}`, {
             ts: Date.now(),
             ok: true,

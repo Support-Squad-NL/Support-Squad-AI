@@ -58,6 +58,14 @@ export function evaluateMissingDeviceIdentity(params: {
   if (params.hasDeviceIdentity) {
     return { kind: "allow" };
   }
+
+  // When device checks are explicitly disabled for Control UI, always allow and rely
+  // solely on shared auth (token/password) + role policy. This is intended only for
+  // tightly-controlled environments like your trial VPS deployment.
+  if (params.isControlUi && params.controlUiAuthPolicy.dangerouslyDisableDeviceAuth) {
+    return { kind: "allow" };
+  }
+
   if (params.isControlUi && !params.controlUiAuthPolicy.allowBypass) {
     // Allow localhost Control UI connections when allowInsecureAuth is configured.
     // Localhost has no network interception risk, and browser SubtleCrypto

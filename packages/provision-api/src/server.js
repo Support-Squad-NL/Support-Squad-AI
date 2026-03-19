@@ -835,6 +835,12 @@ function buildGatewayWsUrl(instanceIp) {
   const explicitBase = process.env.DASHBOARD_PUBLIC_BASE_URL?.trim();
   if (explicitBase) {
     const url = new URL(explicitBase.replace(/\/$/, ""));
+    // For the webshop widget: we need a distinct WS path so the ingress can
+    // route WS traffic to the gateway while keeping `/assistants` for the
+    // provisioning API.
+    // Example: wss://provision.supportsquad.ai/ws
+    const basePath = url.pathname?.replace(/\/$/, "") ?? "";
+    url.pathname = `${basePath || ""}/ws/`.replace(/\/{2,}/g, "/");
     // Strip token query params for the widget; token is returned separately in `widget.token`.
     url.search = "";
     url.hash = "";

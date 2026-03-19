@@ -49,6 +49,14 @@ export class ContaboClient {
     return response?.data?.[0];
   }
 
+  async reinstallInstance(instanceId, payload) {
+    const response = await this.#request(`/compute/instances/${instanceId}`, {
+      method: "PUT",
+      body: payload,
+    });
+    return response?.data?.[0];
+  }
+
   async getInstance(instanceId) {
     const response = await this.#request(`/compute/instances/${instanceId}`, {
       method: "GET",

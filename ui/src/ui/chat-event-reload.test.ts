@@ -13,14 +13,14 @@ describe("shouldReloadHistoryForFinalEvent", () => {
     ).toBe(false);
   });
 
-  it("returns true when final event has no message payload", () => {
+  it("returns false when final event has no message payload", () => {
     expect(
       shouldReloadHistoryForFinalEvent({
         runId: "run-1",
         sessionKey: "main",
         state: "final",
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("returns false when final event includes assistant payload", () => {
