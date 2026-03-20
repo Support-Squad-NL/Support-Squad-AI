@@ -100,8 +100,8 @@ export default function register(api: SupportSquadAIPluginApi) {
     if (!matched) return;
 
     return {
-      // Use prependContext so we don't override the default startup/bootstrap behavior.
-      prependContext: systemPrompt,
+      // Use hidden system prompt override; prependContext is injected into the user prompt text.
+      systemPrompt,
     };
   });
 
